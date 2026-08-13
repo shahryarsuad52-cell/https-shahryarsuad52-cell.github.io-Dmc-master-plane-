@@ -6,7 +6,7 @@
 
     <title>DMC Master Plan - Medical Admission Prep</title>
 
-    <!-- Tailwind CSS -->
+    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Font Awesome -->
@@ -15,6 +15,7 @@
     <!-- Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
+    <!-- Bengali Font -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap');
 
@@ -65,9 +66,41 @@
             transition: opacity 1s ease-in-out;
         }
 
-        /* ==========================================
+        /* =========================================
+           BACKGROUND MUSIC PLAYER
+        ========================================= */
+
+        #music-control {
+            position: fixed;
+            bottom: 18px;
+            right: 18px;
+            z-index: 200;
+        }
+
+        .music-panel {
+            background: rgba(15, 23, 42, 0.94);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.12);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.45);
+        }
+
+        @keyframes musicPulse {
+            0%,100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.08);
+            }
+        }
+
+        .music-playing {
+            animation: musicPulse 1.5s infinite ease-in-out;
+        }
+
+        /* =========================================
            SCREEN 3 BACKGROUND SLIDESHOW
-        ========================================== */
+        ========================================= */
 
         .screen-bg-slideshow {
             position: fixed;
@@ -113,2359 +146,294 @@
 
             z-index: 1;
         }
-
-        /* ==========================================
-           MUSIC BUTTON
-        ========================================== */
-
-        #music-control {
-            transition: all 0.25s ease;
-        }
-
-        #music-control.music-playing {
-            box-shadow:
-                0 0 15px rgba(239, 68, 68, 0.5),
-                0 0 30px rgba(239, 68, 68, 0.25);
-        }
-
-        #music-control.music-off {
-            opacity: 0.75;
-        }
-
-        @keyframes musicPulse {
-            0%, 100% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.08);
-            }
-        }
-
-        .music-playing-animation {
-            animation: musicPulse 2s infinite ease-in-out;
-        }
     </style>
 </head>
 
-
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between relative overflow-x-hidden">
 
+<!-- =====================================================
+     BACKGROUND MUSIC
+===================================================== -->
 
-    <!-- =====================================================
-         🎵 PERSISTENT BACKGROUND MUSIC
-         ===================================================== -->
-
-    <audio id="bg-music" loop preload="auto">
-        <source
-            src="https://raw.githubusercontent.com/Anirban-Saha-001/Songs/main/Believer.mp3"
-            type="audio/mpeg"
-        >
-        Your browser does not support audio.
-    </audio>
-
-
-    <!-- =====================================================
-         🎵 MUSIC CONTROL BUTTON
-         ===================================================== -->
-
-    <button
-        id="music-control"
-        onclick="toggleMusic()"
-        aria-label="Toggle background music"
-        class="fixed bottom-5 right-5 z-[150]
-               w-12 h-12 rounded-full
-               bg-red-600/90 hover:bg-red-500
-               text-white
-               shadow-2xl
-               flex items-center justify-center
-               transition transform hover:scale-110
-               border border-red-400/30"
-    >
-        <i id="music-icon" class="fa-solid fa-volume-high"></i>
-    </button>
-
-
-    <!-- =====================================================
-         FEEDBACK TOAST
-         ===================================================== -->
-
-    <div
-        id="feedback-toast"
-        class="fixed top-20 left-1/2
-               -translate-x-1/2
-               z-[120]
-               hidden
-               px-6 py-3
-               rounded-2xl
-               text-center
-               font-bold
-               text-xs md:text-sm
-               shadow-2xl
-               backdrop-blur-md
-               border
-               transition-all duration-300
-               pointer-events-none"
-    >
-        <span id="toast-text"></span>
-    </div>
-
-
-    <!-- =====================================================
-         1. INTRO SCREEN
-         ===================================================== -->
-
-    <div
-        id="intro-screen"
-        class="fixed inset-0
-               bg-cover bg-center
-               z-[100]
-               flex flex-col
-               items-center
-               justify-between
-               p-6
-               relative"
-        style="background-image: url('dmc-gate.jpg');"
+<audio
+    id="bg-music"
+    loop
+    preload="auto"
+    playsinline
+>
+    <source
+        src="https://raw.githubusercontent.com/Anirban-Saha-001/Songs/main/Believer.mp3"
+        type="audio/mpeg"
     >
 
-        <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-xs"></div>
+    <!-- Backup -->
+    <source
+        src="https://cdn.pixabay.com/download/audio/2022/10/25/audio_946d1fdf3b.mp3"
+        type="audio/mpeg"
+    >
+</audio>
 
 
-        <div class="relative z-10 text-center mt-12">
+<!-- =====================================================
+     MUSIC CONTROL
+===================================================== -->
 
-            <span
-                class="bg-red-600/90
-                       text-white
-                       text-[11px]
-                       font-bold
-                       px-3 py-1
-                       rounded-full
-                       uppercase
-                       tracking-wider
-                       shadow-lg"
-            >
-                Target DMC 2026
-            </span>
+<div id="music-control">
 
-            <h1
-                class="text-3xl md:text-5xl
-                       font-extrabold
-                       text-transparent
-                       bg-clip-text
-                       bg-gradient-to-r
-                       from-red-500
-                       via-rose-300
-                       to-amber-200
-                       mt-3
-                       drop-shadow-lg"
-            >
-                DMC MASTER PLAN
-            </h1>
+    <div class="music-panel rounded-2xl p-3">
 
-            <p
-                class="text-slate-300
-                       text-xs md:text-sm
-                       font-semibold
-                       tracking-widest
-                       uppercase
-                       mt-2
-                       drop-shadow"
-            >
-                A Project by Rauha Shahryar Suad
-            </p>
-
-        </div>
-
-
-        <div class="relative z-10 mb-16 text-center">
+        <div class="flex items-center gap-2">
 
             <button
-                onclick="goToPasswordScreen()"
-                class="bg-gradient-to-r
-                       from-red-600
-                       to-rose-600
-                       hover:from-red-500
-                       hover:to-rose-500
-                       text-white
-                       font-extrabold
-                       px-10 py-4
-                       rounded-full
-                       shadow-2xl
-                       shadow-red-900/60
-                       text-lg
-                       transition
-                       transform
-                       hover:scale-110
-                       active:scale-95
-                       flex items-center
-                       gap-3
-                       mx-auto
-                       animate-pulse-glow"
+                id="music-toggle"
+                onclick="toggleMusic()"
+                class="w-11 h-11 rounded-xl bg-red-600 hover:bg-red-500 flex items-center justify-center text-white shadow-lg transition"
             >
-
-                <i class="fa-solid fa-play"></i>
-
-                PLAY
-
+                <i id="music-icon" class="fa-solid fa-volume-high"></i>
             </button>
 
-        </div>
+            <div class="hidden sm:block">
 
-    </div>
+                <div class="text-[10px] text-slate-400">
+                    MOTIVATION MUSIC
+                </div>
 
-
-    <!-- =====================================================
-         2. PASSWORD SCREEN
-         ===================================================== -->
-
-    <div
-        id="password-screen"
-        class="fixed inset-0
-               z-[90]
-               hidden
-               flex-col
-               items-center
-               justify-center
-               p-4
-               bg-cover
-               bg-center
-               relative"
-        style="background-image: url('dmc-logo.jpg');"
-    >
-
-        <div class="absolute inset-0 bg-slate-950 backdrop-blur-md"></div>
-
-
-        <div
-            class="relative z-10
-                   glass-card
-                   p-8
-                   rounded-3xl
-                   max-w-md
-                   w-full
-                   text-center
-                   shadow-2xl
-                   border
-                   border-slate-700"
-        >
-
-            <div
-                class="w-20 h-20
-                       mx-auto mb-4
-                       rounded-full
-                       border-2
-                       border-red-500
-                       overflow-hidden
-                       shadow-lg"
-            >
-
-                <img
-                    src="dmc-logo.jpg"
-                    alt="DMC Logo"
-                    class="w-full h-full object-cover"
-                    onError="this.src='https://via.placeholder.com/150?text=DMC'"
+                <div
+                    id="music-status"
+                    class="text-xs font-bold text-emerald-400"
                 >
+                    Playing • Believer
+                </div>
 
             </div>
-
-
-            <h2 class="text-xl font-bold text-slate-100 mb-1">
-                পাসওয়ার্ড প্রদান করুন
-            </h2>
-
-            <p class="text-xs text-slate-400 mb-6">
-                ওয়েবসাইটে এক্সেস পেতে সিক্রেট কি দিন
-            </p>
-
-
-            <input
-                type="password"
-                id="pass-input"
-                placeholder="Enter password..."
-                class="w-full
-                       bg-slate-900/90
-                       border
-                       border-slate-700
-                       rounded-xl
-                       px-4 py-3
-                       text-center
-                       text-sm
-                       text-white
-                       focus:outline-none
-                       focus:border-red-500
-                       mb-4
-                       tracking-wider"
-                onkeydown="if(event.key === 'Enter') checkPassword();"
-            >
-
-
-            <button
-                onclick="checkPassword()"
-                class="w-full
-                       bg-gradient-to-r
-                       from-red-600
-                       to-rose-600
-                       hover:from-red-500
-                       hover:to-rose-500
-                       text-white
-                       font-bold
-                       py-3
-                       rounded-xl
-                       shadow-lg
-                       transition"
-            >
-                আনলক করুন
-            </button>
-
-
-            <p
-                id="pass-error"
-                class="text-red-400
-                       text-xs
-                       mt-3
-                       hidden"
-            >
-                ভুল পাসওয়ার্ড! সঠিক পাসওয়ার্ড দিয়ে চেষ্টা করুন।
-            </p>
 
         </div>
 
     </div>
 
-
-    <!-- =====================================================
-         3. MAIN APPLICATION
-         ===================================================== -->
-
-    <div
-        id="main-app"
-        class="hidden
-               flex-col
-               justify-between
-               min-h-screen
-               relative
-               z-10"
-    >
+</div>
 
 
-        <!-- BACKGROUND SLIDESHOW -->
+<!-- =====================================================
+     FEEDBACK TOAST
+===================================================== -->
 
-        <div class="screen-bg-slideshow">
-
-            <div
-                class="bg-slide-item active"
-                style="background-image: url('29378_2.jpg');"
-            ></div>
-
-            <div
-                class="bg-slide-item"
-                style="background-image: url('29485_2.jpg');"
-            ></div>
-
-            <div
-                class="bg-slide-item"
-                style="background-image: url('24676.jpg');"
-            ></div>
-
-            <div
-                class="bg-slide-item"
-                style="background-image: url('2134.jpg');"
-            ></div>
-
-            <div
-                class="bg-slide-item"
-                style="background-image: url('7206.jpg');"
-            ></div>
-
-            <div
-                class="bg-slide-item"
-                style="background-image: url('9775.png');"
-            ></div>
-
-            <div
-                class="bg-slide-item"
-                style="background-image: url('21427_2.jpg');"
-            ></div>
-
-            <div
-                class="bg-slide-item"
-                style="background-image: url('21538.jpg');"
-            ></div>
-
-            <div
-                class="bg-slide-item"
-                style="background-image: url('32134.png');"
-            ></div>
-
-            <div
-                class="bg-slide-item"
-                style="background-image: url('32341.jpg');"
-            ></div>
-
-            <div class="bg-slide-overlay"></div>
-
-        </div>
+<div
+    id="feedback-toast"
+    class="fixed top-20 left-1/2 -translate-x-1/2 z-[120] hidden px-6 py-3 rounded-2xl text-center font-bold text-xs md:text-sm shadow-2xl backdrop-blur-md border transition-all duration-300 pointer-events-none"
+>
+    <span id="toast-text"></span>
+</div>
 
 
-        <!-- =================================================
-             HEADER
-             ================================================= -->
+<!-- =====================================================
+     INTRO SCREEN
+===================================================== -->
 
-        <header
-            class="bg-slate-900/90
-                   backdrop-blur-md
-                   border-b
-                   border-slate-800
-                   sticky
-                   top-0
-                   z-40"
+<div
+    id="intro-screen"
+    class="fixed inset-0 bg-cover bg-center z-[100] flex flex-col items-center justify-between p-6 relative"
+    style="background-image: url('dmc-gate.jpg');"
+>
+
+    <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-xs"></div>
+
+    <div class="relative z-10 text-center mt-12">
+
+        <span
+            class="bg-red-600/90 text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-lg"
         >
+            Target DMC 2026
+        </span>
 
-            <div
-                class="max-w-5xl
-                       mx-auto
-                       px-4
-                       py-3
-                       flex
-                       justify-between
-                       items-center"
-            >
-
-                <div
-                    class="flex
-                           items-center
-                           gap-3
-                           cursor-pointer"
-                    onclick="clickSound(); showSubjects();"
-                >
-
-                    <div
-                        class="w-10 h-10
-                               bg-red-600
-                               rounded-xl
-                               flex
-                               items-center
-                               justify-center
-                               text-white
-                               text-xl
-                               shadow-lg
-                               shadow-red-900/40"
-                    >
-
-                        <i class="fa-solid fa-stethoscope"></i>
-
-                    </div>
-
-
-                    <div>
-
-                        <h1
-                            class="text-base
-                                   font-bold
-                                   text-red-500
-                                   leading-none"
-                        >
-                            DMC MASTER PLAN
-                        </h1>
-
-                        <span
-                            class="text-[10px]
-                                   text-slate-400"
-                        >
-                            By Rauha Shahryar Suad
-                        </span>
-
-                    </div>
-
-                </div>
-
-
-                <div class="relative">
-
-                    <button
-                        onclick="clickSound(); toggleMenu();"
-                        class="w-10 h-10
-                               bg-slate-800
-                               hover:bg-slate-700
-                               text-slate-200
-                               rounded-xl
-                               flex
-                               items-center
-                               justify-center
-                               text-lg
-                               transition"
-                    >
-
-                        <i class="fa-solid fa-ellipsis-vertical"></i>
-
-                    </button>
-
-
-                    <div
-                        id="dropdown-menu"
-                        class="hidden
-                               absolute
-                               right-0
-                               mt-2
-                               w-48
-                               bg-slate-900
-                               border
-                               border-slate-700
-                               rounded-xl
-                               shadow-2xl
-                               py-2
-                               z-50"
-                    >
-
-                        <button
-                            onclick="clickSound(); openAddModal(); toggleMenu();"
-                            class="w-full
-                                   text-left
-                                   px-4 py-2.5
-                                   text-xs
-                                   font-semibold
-                                   text-slate-200
-                                   hover:bg-red-600/20
-                                   hover:text-red-400
-                                   flex
-                                   items-center
-                                   gap-2"
-                        >
-
-                            <i class="fa-solid fa-plus-circle"></i>
-
-                            নতুন প্রশ্ন যোগ করুন
-
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </header>
-
-
-        <!-- =================================================
-             MAIN CONTENT
-             ================================================= -->
-
-        <main
-            class="max-w-4xl
-                   mx-auto
-                   px-4
-                   py-6
-                   flex-grow
-                   w-full
-                   relative
-                   z-10"
+        <h1
+            class="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-rose-300 to-amber-200 mt-3 drop-shadow-lg"
         >
-
-
-            <!-- SUBJECT VIEW -->
-
-            <div id="subject-view">
-
-                <div
-                    class="relative
-                           w-full
-                           h-44 md:h-56
-                           rounded-2xl
-                           overflow-hidden
-                           mb-8
-                           shadow-2xl
-                           border
-                           border-slate-800"
-                >
-
-                    <img
-                        id="slideshow-img"
-                        src="29378_2.jpg"
-                        class="w-full h-full object-cover slide-fade"
-                        onError="this.src='https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=80'"
-                    >
-
-                    <div
-                        class="absolute
-                               inset-0
-                               bg-gradient-to-t
-                               from-slate-950
-                               via-transparent
-                               to-transparent"
-                    ></div>
-
-
-                    <div
-                        class="absolute
-                               bottom-3
-                               left-4
-                               right-4
-                               text-left"
-                    >
-
-                        <span
-                            class="bg-red-600/80
-                                   text-white
-                                   text-[10px]
-                                   font-bold
-                                   px-2
-                                   py-0.5
-                                   rounded-full
-                                   uppercase"
-                        >
-                            Medical Admission
-                        </span>
-
-                        <h3
-                            class="text-sm md:text-lg
-                                   font-bold
-                                   text-slate-100
-                                   mt-1"
-                        >
-                            স্বপ্নের ঢাকা মেডিকেল কলেজ প্রিপারেশন
-                        </h3>
-
-                    </div>
-
-                </div>
-
-
-                <div class="text-center mb-6">
-
-                    <h2
-                        class="text-2xl
-                               font-extrabold
-                               text-slate-100"
-                    >
-                        বিষয় নির্বাচন করুন
-                    </h2>
-
-                </div>
-
-
-                <div
-                    class="grid
-                           grid-cols-2
-                           md:grid-cols-3
-                           lg:grid-cols-5
-                           gap-4
-                           mb-8
-                           justify-items-center"
-                >
-
-
-                    <!-- BIOLOGY -->
-
-                    <div
-                        onclick="clickSound(); selectSubject('Biology')"
-                        class="cursor-pointer
-                               group
-                               flex
-                               flex-col
-                               items-center
-                               w-full"
-                    >
-
-                        <div
-                            class="w-20 h-20
-                                   md:w-24 md:h-24
-                                   rounded-full
-                                   bg-slate-900
-                                   border-2
-                                   border-emerald-500/40
-                                   group-hover:border-emerald-400
-                                   group-hover:scale-105
-                                   transition
-                                   flex
-                                   items-center
-                                   justify-center
-                                   text-3xl
-                                   shadow-lg
-                                   relative"
-                        >
-
-                            🧬
-
-                            <span
-                                id="badge-Biology"
-                                class="absolute
-                                       -top-1
-                                       -right-1
-                                       bg-emerald-500
-                                       text-slate-950
-                                       text-[10px]
-                                       font-bold
-                                       px-2
-                                       py-0.5
-                                       rounded-full"
-                            >
-                                0
-                            </span>
-
-                        </div>
-
-
-                        <h3
-                            class="mt-2
-                                   font-bold
-                                   text-xs md:text-sm
-                                   text-slate-200
-                                   group-hover:text-emerald-400"
-                        >
-                            জীববিজ্ঞান
-                        </h3>
-
-                    </div>
-
-
-                    <!-- CHEMISTRY -->
-
-                    <div
-                        onclick="clickSound(); selectSubject('Chemistry')"
-                        class="cursor-pointer
-                               group
-                               flex
-                               flex-col
-                               items-center
-                               w-full"
-                    >
-
-                        <div
-                            class="w-20 h-20
-                                   md:w-24 md:h-24
-                                   rounded-full
-                                   bg-slate-900
-                                   border-2
-                                   border-cyan-500/40
-                                   group-hover:border-cyan-400
-                                   group-hover:scale-105
-                                   transition
-                                   flex
-                                   items-center
-                                   justify-center
-                                   text-3xl
-                                   shadow-lg
-                                   relative"
-                        >
-
-                            🧪
-
-                            <span
-                                id="badge-Chemistry"
-                                class="absolute
-                                       -top-1
-                                       -right-1
-                                       bg-cyan-500
-                                       text-slate-950
-                                       text-[10px]
-                                       font-bold
-                                       px-2
-                                       py-0.5
-                                       rounded-full"
-                            >
-                                0
-                            </span>
-
-                        </div>
-
-
-                        <h3
-                            class="mt-2
-                                   font-bold
-                                   text-xs md:text-sm
-                                   text-slate-200
-                                   group-hover:text-cyan-400"
-                        >
-                            রসায়ন
-                        </h3>
-
-                    </div>
-
-
-                    <!-- PHYSICS -->
-
-                    <div
-                        onclick="clickSound(); selectSubject('Physics')"
-                        class="cursor-pointer
-                               group
-                               flex
-                               flex-col
-                               items-center
-                               w-full"
-                    >
-
-                        <div
-                            class="w-20 h-20
-                                   md:w-24 md:h-24
-                                   rounded-full
-                                   bg-slate-900
-                                   border-2
-                                   border-blue-500/40
-                                   group-hover:border-blue-400
-                                   group-hover:scale-105
-                                   transition
-                                   flex
-                                   items-center
-                                   justify-center
-                                   text-3xl
-                                   shadow-lg
-                                   relative"
-                        >
-
-                            ⚛️
-
-                            <span
-                                id="badge-Physics"
-                                class="absolute
-                                       -top-1
-                                       -right-1
-                                       bg-blue-500
-                                       text-slate-950
-                                       text-[10px]
-                                       font-bold
-                                       px-2
-                                       py-0.5
-                                       rounded-full"
-                            >
-                                0
-                            </span>
-
-                        </div>
-
-
-                        <h3
-                            class="mt-2
-                                   font-bold
-                                   text-xs md:text-sm
-                                   text-slate-200
-                                   group-hover:text-blue-400"
-                        >
-                            পদার্থবিজ্ঞান
-                        </h3>
-
-                    </div>
-
-
-                    <!-- ENGLISH -->
-
-                    <div
-                        onclick="clickSound(); selectSubject('English')"
-                        class="cursor-pointer
-                               group
-                               flex
-                               flex-col
-                               items-center
-                               w-full"
-                    >
-
-                        <div
-                            class="w-20 h-20
-                                   md:w-24 md:h-24
-                                   rounded-full
-                                   bg-slate-900
-                                   border-2
-                                   border-amber-500/40
-                                   group-hover:border-amber-400
-                                   group-hover:scale-105
-                                   transition
-                                   flex
-                                   items-center
-                                   justify-center
-                                   text-3xl
-                                   shadow-lg
-                                   relative"
-                        >
-
-                            📚
-
-                            <span
-                                id="badge-English"
-                                class="absolute
-                                       -top-1
-                                       -right-1
-                                       bg-amber-500
-                                       text-slate-950
-                                       text-[10px]
-                                       font-bold
-                                       px-2
-                                       py-0.5
-                                       rounded-full"
-                            >
-                                0
-                            </span>
-
-                        </div>
-
-
-                        <h3
-                            class="mt-2
-                                   font-bold
-                                   text-xs md:text-sm
-                                   text-slate-200
-                                   group-hover:text-amber-400"
-                        >
-                            ইংরেজি (BCS)
-                        </h3>
-
-                    </div>
-
-
-                    <!-- GK -->
-
-                    <div
-                        onclick="clickSound(); selectSubject('GK')"
-                        class="cursor-pointer
-                               group
-                               flex
-                               flex-col
-                               items-center
-                               w-full
-                               col-span-2
-                               md:col-span-1"
-                    >
-
-                        <div
-                            class="w-20 h-20
-                                   md:w-24 md:h-24
-                                   rounded-full
-                                   bg-slate-900
-                                   border-2
-                                   border-purple-500/40
-                                   group-hover:border-purple-400
-                                   group-hover:scale-105
-                                   transition
-                                   flex
-                                   items-center
-                                   justify-center
-                                   text-3xl
-                                   shadow-lg
-                                   relative"
-                        >
-
-                            🧠
-
-                            <span
-                                id="badge-GK"
-                                class="absolute
-                                       -top-1
-                                       -right-1
-                                       bg-purple-500
-                                       text-slate-950
-                                       text-[10px]
-                                       font-bold
-                                       px-2
-                                       py-0.5
-                                       rounded-full"
-                            >
-                                0
-                            </span>
-
-                        </div>
-
-
-                        <h3
-                            class="mt-2
-                                   font-bold
-                                   text-xs md:text-sm
-                                   text-slate-200
-                                   group-hover:text-purple-400"
-                        >
-                            সাধারণ জ্ঞান (BCS)
-                        </h3>
-
-                    </div>
-
-                </div>
-
-
-                <!-- BATTLE -->
-
-                <div
-                    class="glass-card
-                           rounded-2xl
-                           p-5
-                           border
-                           border-red-900/40
-                           text-center
-                           relative
-                           overflow-hidden"
-                >
-
-                    <div
-                        class="flex
-                               items-center
-                               justify-center
-                               gap-2
-                               mb-2"
-                    >
-
-                        <span class="text-2xl">
-                            ⚔️
-                        </span>
-
-                        <h3
-                            class="text-lg
-                                   font-bold
-                                   text-red-400"
-                        >
-                            1-vs-1 Battle Mode
-                        </h3>
-
-                    </div>
-
-
-                    <p
-                        class="text-xs
-                               text-slate-400
-                               mb-4"
-                    >
-                        সাবজেক্ট ও প্রশ্ন সংখ্যা চয়ন করে বন্ধুর সাথে লাইভ ব্যাটল খেলুন!
-                    </p>
-
-
-                    <button
-                        onclick="clickSound(); openBattleModal();"
-                        class="bg-gradient-to-r
-                               from-red-600
-                               to-amber-600
-                               hover:from-red-500
-                               hover:to-amber-500
-                               text-white
-                               text-xs
-                               font-bold
-                               px-6 py-2.5
-                               rounded-xl
-                               shadow-lg
-                               transition"
-                    >
-                        ব্যাটল চ্যালেঞ্জ শুরু করুন
-                    </button>
-
-                </div>
-
-            </div>
-
-
-            <!-- =================================================
-                 QUIZ VIEW
-                 ================================================= -->
-
-            <div id="quiz-view" class="hidden">
-
-                <div
-                    class="flex
-                           items-center
-                           justify-between
-                           mb-4"
-                >
-
-                    <button
-                        onclick="clickSound(); showSubjects();"
-                        class="text-xs
-                               bg-slate-800
-                               hover:bg-slate-700
-                               text-slate-300
-                               px-3 py-1.5
-                               rounded-lg
-                               flex
-                               items-center
-                               gap-1.5
-                               transition"
-                    >
-
-                        <i class="fa-solid fa-arrow-left"></i>
-
-                        বিষয়ে ফিরুন
-
-                    </button>
-
-
-                    <div class="flex items-center gap-2">
-
-                        <span
-                            id="streak-counter"
-                            class="text-xs
-                                   font-bold
-                                   px-2.5 py-1
-                                   rounded-full
-                                   bg-amber-950/80
-                                   border
-                                   border-amber-600
-                                   text-amber-300"
-                        >
-                            🔥 Streak: 0
-                        </span>
-
-
-                        <span
-                            id="active-subject-badge"
-                            class="text-xs
-                                   font-bold
-                                   px-3 py-1
-                                   rounded-full
-                                   bg-red-950/60
-                                   border
-                                   border-red-800
-                                   text-red-400"
-                        >
-                            Biology
-                        </span>
-
-                    </div>
-
-                </div>
-
-
-                <div
-                    id="college-banner"
-                    class="hidden
-                           mb-4
-                           p-3
-                           bg-gradient-to-r
-                           from-amber-600
-                           to-red-600
-                           text-white
-                           font-extrabold
-                           text-center
-                           rounded-xl
-                           text-xs md:text-sm
-                           shadow-xl
-                           animate-bounce"
-                >
-
-                    🎉
-
-                    <span id="college-name">
-                        Allotted College: Sir Salimullah Medical College
-                    </span>
-
-                </div>
-
-
-                <div
-                    id="single-question-card"
-                    class="glass-card
-                           rounded-2xl
-                           p-6
-                           transition-all
-                           duration-300"
-                >
-                </div>
-
-
-                <div
-                    id="next-btn-container"
-                    class="hidden
-                           mt-6
-                           text-right"
-                >
-
-                    <button
-                        onclick="clickSound(); loadNextQuestion();"
-                        class="bg-gradient-to-r
-                               from-emerald-600
-                               to-teal-600
-                               hover:from-emerald-500
-                               hover:to-teal-500
-                               text-white
-                               font-bold
-                               px-6 py-2.5
-                               rounded-xl
-                               text-sm
-                               shadow-lg
-                               transition"
-                    >
-
-                        পরবর্তী প্রশ্ন
-
-                        <i class="fa-solid fa-arrow-right ml-1"></i>
-
-                    </button>
-
-                </div>
-
-            </div>
-
-        </main>
-
-
-        <!-- FOOTER -->
-
-        <footer
-            class="bg-slate-900/40
-                   border-t
-                   border-slate-800/80
-                   py-3
-                   text-center
-                   text-[11px]
-                   text-slate-500
-                   mt-auto
-                   relative
-                   z-10"
+            DMC MASTER PLAN
+        </h1>
+
+        <p
+            class="text-slate-300 text-xs md:text-sm font-semibold tracking-widest uppercase mt-2 drop-shadow"
         >
-            DMC Master Plan &copy; 2026 - Designed for Medical Aspirants
-        </footer>
+            A Project by Rauha Shahryar Suad
+        </p>
 
     </div>
 
 
-    <!-- =====================================================
-         ADD QUESTION MODAL
-         ===================================================== -->
+    <div class="relative z-10 mb-16 text-center">
+
+        <button
+            onclick="goToPasswordScreen()"
+            class="bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-extrabold px-10 py-4 rounded-full shadow-2xl shadow-red-900/60 text-lg transition transform hover:scale-110 active:scale-95 flex items-center gap-3 mx-auto animate-pulse-glow"
+        >
+            <i class="fa-solid fa-play"></i>
+
+            PLAY
+
+        </button>
+
+        <p class="text-[10px] text-slate-400 mt-4">
+            🎵 Motivational music will start automatically
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     PASSWORD SCREEN
+===================================================== -->
+
+<div
+    id="password-screen"
+    class="fixed inset-0 z-[90] hidden flex-col items-center justify-center p-4 bg-cover bg-center relative"
+    style="background-image: url('dmc-logo.jpg');"
+>
+
+    <div class="absolute inset-0 bg-slate-950 backdrop-blur-md"></div>
 
     <div
-        id="add-modal"
-        class="fixed
-               inset-0
-               bg-black/80
-               backdrop-blur-sm
-               hidden
-               items-center
-               justify-center
-               p-4
-               z-50"
+        class="relative z-10 glass-card p-8 rounded-3xl max-w-md w-full text-center shadow-2xl border border-slate-700"
     >
 
         <div
-            class="bg-slate-900
-                   border
-                   border-slate-700
-                   rounded-2xl
-                   p-6
-                   w-full
-                   max-w-lg
-                   shadow-2xl
-                   relative"
+            class="w-20 h-20 mx-auto mb-4 rounded-full border-2 border-red-500 overflow-hidden shadow-lg"
         >
 
-            <div
-                class="flex
-                       justify-between
-                       items-center
-                       mb-4
-                       border-b
-                       border-slate-800
-                       pb-3"
+            <img
+                src="dmc-logo.jpg"
+                alt="DMC Logo"
+                class="w-full h-full object-cover"
+                onError="this.src='https://via.placeholder.com/150?text=DMC'"
             >
-
-                <h3
-                    class="text-base
-                           font-bold
-                           text-slate-100
-                           flex
-                           items-center
-                           gap-2"
-                >
-
-                    <i class="fa-solid fa-pen-to-square text-red-500"></i>
-
-                    নতুন প্রশ্ন যোগ করুন
-
-                </h3>
-
-
-                <button
-                    onclick="clickSound(); closeAddModal();"
-                    class="text-slate-400 hover:text-white"
-                >
-
-                    <i class="fa-solid fa-xmark text-xl"></i>
-
-                </button>
-
-            </div>
-
-
-            <form
-                id="add-mcq-form"
-                onsubmit="saveQuestion(event)"
-                class="space-y-3"
-            >
-
-                <div>
-
-                    <label
-                        class="block
-                               text-xs
-                               text-slate-400
-                               mb-1"
-                    >
-                        বিষয়
-                    </label>
-
-
-                    <select
-                        id="input-subject"
-                        class="w-full
-                               bg-slate-950
-                               border
-                               border-slate-700
-                               rounded-xl
-                               p-2.5
-                               text-xs
-                               text-white"
-                    >
-
-                        <option value="Biology">
-                            জীববিজ্ঞান
-                        </option>
-
-                        <option value="Chemistry">
-                            রসায়ন
-                        </option>
-
-                        <option value="Physics">
-                            পদার্থবিজ্ঞান
-                        </option>
-
-                        <option value="English">
-                            ইংরেজি (BCS)
-                        </option>
-
-                        <option value="GK">
-                            সাধারণ জ্ঞান (BCS)
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-                <div>
-
-                    <label
-                        class="block
-                               text-xs
-                               text-slate-400
-                               mb-1"
-                    >
-                        প্রশ্ন
-                    </label>
-
-
-                    <textarea
-                        id="input-question"
-                        required
-                        class="w-full
-                               bg-slate-950
-                               border
-                               border-slate-700
-                               rounded-xl
-                               p-2
-                               text-xs
-                               text-white"
-                        rows="2"
-                    ></textarea>
-
-                </div>
-
-
-                <div class="grid grid-cols-2 gap-2">
-
-                    <input
-                        type="text"
-                        id="opt-0"
-                        placeholder="অপশন ১"
-                        required
-                        class="bg-slate-950
-                               border
-                               border-slate-700
-                               rounded-lg
-                               p-2
-                               text-xs
-                               text-white"
-                    >
-
-                    <input
-                        type="text"
-                        id="opt-1"
-                        placeholder="অপশন ২"
-                        required
-                        class="bg-slate-950
-                               border
-                               border-slate-700
-                               rounded-lg
-                               p-2
-                               text-xs
-                               text-white"
-                    >
-
-                    <input
-                        type="text"
-                        id="opt-2"
-                        placeholder="অপশন ৩"
-                        required
-                        class="bg-slate-950
-                               border
-                               border-slate-700
-                               rounded-lg
-                               p-2
-                               text-xs
-                               text-white"
-                    >
-
-                    <input
-                        type="text"
-                        id="opt-3"
-                        placeholder="অপশন ৪"
-                        required
-                        class="bg-slate-950
-                               border
-                               border-slate-700
-                               rounded-lg
-                               p-2
-                               text-xs
-                               text-white"
-                    >
-
-                </div>
-
-
-                <div>
-
-                    <label
-                        class="block
-                               text-xs
-                               text-slate-400
-                               mb-1"
-                    >
-                        সঠিক উত্তর
-                    </label>
-
-
-                    <select
-                        id="input-correct"
-                        class="w-full
-                               bg-slate-950
-                               border
-                               border-slate-700
-                               rounded-xl
-                               p-2
-                               text-xs
-                               text-white"
-                    >
-
-                        <option value="0">
-                            অপশন ১
-                        </option>
-
-                        <option value="1">
-                            অপশন ২
-                        </option>
-
-                        <option value="2">
-                            অপশন ৩
-                        </option>
-
-                        <option value="3">
-                            অপশন ৪
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-                <div>
-
-                    <input
-                        type="text"
-                        id="input-explanation"
-                        placeholder="সংক্ষিপ্ত ব্যাখ্যা (Optional)"
-                        class="w-full
-                               bg-slate-950
-                               border
-                               border-slate-700
-                               rounded-xl
-                               p-2
-                               text-xs
-                               text-white"
-                    >
-
-                </div>
-
-
-                <div
-                    class="flex
-                           justify-end
-                           gap-2
-                           pt-2"
-                >
-
-                    <button
-                        type="button"
-                        onclick="clickSound(); closeAddModal();"
-                        class="px-4
-                               py-2
-                               bg-slate-800
-                               rounded-xl
-                               text-xs"
-                    >
-                        বাতিল
-                    </button>
-
-
-                    <button
-                        type="submit"
-                        class="px-5
-                               py-2
-                               bg-red-600
-                               hover:bg-red-500
-                               rounded-xl
-                               text-xs
-                               font-bold"
-                    >
-                        সেভ করুন
-                    </button>
-
-                </div>
-
-            </form>
 
         </div>
 
+        <h2 class="text-xl font-bold text-slate-100 mb-1">
+            পাসওয়ার্ড প্রদান করুন
+        </h2>
+
+        <p class="text-xs text-slate-400 mb-6">
+            ওয়েবসাইটে এক্সেস পেতে সিক্রেট কি দিন
+        </p>
+
+        <input
+            type="password"
+            id="pass-input"
+            placeholder="Enter password..."
+            class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-3 text-center text-sm text-white focus:outline-none focus:border-red-500 mb-4 tracking-wider"
+            onkeydown="if(event.key === 'Enter') checkPassword()"
+        >
+
+        <button
+            onclick="checkPassword()"
+            class="w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold py-3 rounded-xl shadow-lg transition"
+        >
+            আনলক করুন
+        </button>
+
+        <p
+            id="pass-error"
+            class="text-red-400 text-xs mt-3 hidden"
+        >
+            ভুল পাসওয়ার্ড! সঠিক পাসওয়ার্ড দিয়ে চেষ্টা করুন।
+        </p>
+
     </div>
 
+</div>
 
-    <!-- =====================================================
-         BATTLE MODAL
-         ===================================================== -->
+
+<!-- =====================================================
+     MAIN APP
+===================================================== -->
+
+<div
+    id="main-app"
+    class="hidden flex-col justify-between min-h-screen relative z-10"
+>
+
+
+<!-- BACKGROUND SLIDESHOW -->
+
+<div class="screen-bg-slideshow">
 
     <div
-        id="battle-modal"
-        class="fixed
-               inset-0
-               bg-black/80
-               backdrop-blur-sm
-               hidden
-               items-center
-               justify-center
-               p-4
-               z-50"
+        class="bg-slide-item active"
+        style="background-image: url('29378_2.jpg');"
+    ></div>
+
+    <div
+        class="bg-slide-item"
+        style="background-image: url('29485_2.jpg');"
+    ></div>
+
+    <div
+        class="bg-slide-item"
+        style="background-image: url('24676.jpg');"
+    ></div>
+
+    <div
+        class="bg-slide-item"
+        style="background-image: url('2134.jpg');"
+    ></div>
+
+    <div
+        class="bg-slide-item"
+        style="background-image: url('7206.jpg');"
+    ></div>
+
+    <div
+        class="bg-slide-item"
+        style="background-image: url('9775.png');"
+    ></div>
+
+    <div
+        class="bg-slide-item"
+        style="background-image: url('21427_2.jpg');"
+    ></div>
+
+    <div
+        class="bg-slide-item"
+        style="background-image: url('21538.jpg');"
+    ></div>
+
+    <div
+        class="bg-slide-item"
+        style="background-image: url('32134.png');"
+    ></div>
+
+    <div
+        class="bg-slide-item"
+        style="background-image: url('32341.jpg');"
+    ></div>
+
+    <div class="bg-slide-overlay"></div>
+
+</div>
+
+
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
+<header
+    class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40"
+>
+
+    <div
+        class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center"
     >
 
         <div
-            class="bg-slate-900
-                   border
-                   border-slate-700
-                   rounded-2xl
-                   p-6
-                   w-full
-                   max-w-md
-                   shadow-2xl"
+            class="flex items-center gap-3 cursor-pointer"
+            onclick="clickSound(); showSubjects();"
         >
 
-            <h3
-                class="text-lg
-                       font-bold
-                       text-slate-100
-                       mb-2
-                       text-center"
-            >
-                ⚔️ 1-vs-1 Battle Setup
-            </h3>
-
-
-            <p
-                class="text-xs
-                       text-slate-400
-                       mb-4
-                       text-center"
-            >
-                বিষয় ও প্রশ্ন সংখ্যা সিলেক্ট করে চ্যালেঞ্জ লিংক বানান
-            </p>
-
-
-            <div class="space-y-4 mb-5">
-
-                <div>
-
-                    <label
-                        class="block
-                               text-xs
-                               text-slate-400
-                               mb-1"
-                    >
-                        বিষয় নির্বাচন করুন
-                    </label>
-
-
-                    <select
-                        id="battle-subject-select"
-                        class="w-full
-                               bg-slate-950
-                               border
-                               border-slate-700
-                               rounded-xl
-                               p-2.5
-                               text-xs
-                               text-white"
-                    >
-
-                        <option value="Biology">
-                            জীববিজ্ঞান
-                        </option>
-
-                        <option value="Chemistry">
-                            রসায়ন
-                        </option>
-
-                        <option value="Physics">
-                            পদার্থবিজ্ঞান
-                        </option>
-
-                        <option value="English">
-                            ইংরেজি (BCS)
-                        </option>
-
-                        <option value="GK">
-                            সাধারণ জ্ঞান (BCS)
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-                <div>
-
-                    <label
-                        class="block
-                               text-xs
-                               text-slate-400
-                               mb-1"
-                    >
-                        প্রশ্ন সংখ্যা নির্বাচন করুন
-                    </label>
-
-
-                    <div class="grid grid-cols-2 gap-3">
-
-                        <button
-                            type="button"
-                            onclick="clickSound(); setBattleQCount(10)"
-                            id="q-btn-10"
-                            class="battle-q-btn
-                                   bg-red-600
-                                   border
-                                   border-red-500
-                                   text-white
-                                   font-bold
-                                   py-2.5
-                                   rounded-xl
-                                   text-xs"
-                        >
-                            ১০ টি প্রশ্ন
-                        </button>
-
-
-                        <button
-                            type="button"
-                            onclick="clickSound(); setBattleQCount(20)"
-                            id="q-btn-20"
-                            class="battle-q-btn
-                                   bg-slate-800
-                                   border
-                                   border-slate-700
-                                   text-slate-300
-                                   font-bold
-                                   py-2.5
-                                   rounded-xl
-                                   text-xs"
-                        >
-                            ২০ টি প্রশ্ন
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <button
-                onclick="clickSound(); generateBattleLink()"
-                class="w-full
-                       bg-gradient-to-r
-                       from-red-600
-                       to-amber-600
-                       hover:from-red-500
-                       hover:to-amber-500
-                       text-white
-                       font-bold
-                       py-2.5
-                       rounded-xl
-                       text-xs
-                       mb-3
-                       shadow-lg"
-            >
-                লিংক তৈরি করুন 🔗
-            </button>
-
-
             <div
-                id="battle-link-box"
-                class="hidden mb-4"
+                class="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center text-white text-xl shadow-lg shadow-red-900/40"
             >
 
-                <input
-                    type="text"
-                    id="battle-url-input"
-                    readonly
-                    class="w-full
-                           bg-slate-950
-                           border
-                           border-slate-700
-                           rounded-lg
-                           p-2
-                           text-xs
-                           text-center
-                           text-slate-300
-                           mb-2"
-                >
-
-
-                <button
-                    onclick="clickSound(); copyBattleLink()"
-                    class="w-full
-                           bg-emerald-600
-                           hover:bg-emerald-500
-                           text-white
-                           font-bold
-                           py-2
-                           rounded-lg
-                           text-xs"
-                >
-                    লিংক কপি করুন 📋
-                </button>
-
-            </div>
-
-
-            <div class="text-center">
-
-                <button
-                    onclick="clickSound(); closeBattleModal()"
-                    class="text-xs
-                           text-slate-500
-                           hover:text-slate-300"
-                >
-                    বন্ধ করুন
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         JAVASCRIPT
-         ===================================================== -->
-
-    <script>
-
-        /* ==================================================
-           AUDIO CONTEXT
-        ================================================== */
-
-        const audioCtx =
-            new (window.AudioContext || window.webkitAudioContext)();
-
-
-        /* ==================================================
-           🎵 BACKGROUND MUSIC SYSTEM
-        ================================================== */
-
-        const bgMusic =
-            document.getElementById('bg-music');
-
-        const musicButton =
-            document.getElementById('music-control');
-
-        const musicIcon =
-            document.getElementById('music-icon');
-
-
-        /*
-         * Background music volume
-         *
-         * 0.18 = 18%
-         * Ideal for studying / MCQ practice
-         */
-
-        bgMusic.volume = 0.18;
-
-        bgMusic.loop = true;
-
-
-        let musicStarted = false;
-
-        let musicMuted = false;
-
-
-        /* ==================================================
-           START MUSIC
-        ================================================== */
-
-        function startBackgroundMusic() {
-
-            if (musicStarted && !bgMusic.paused) {
-                return;
-            }
-
-            if (musicMuted) {
-                return;
-            }
-
-            bgMusic.volume = 0.18;
-
-            const playPromise = bgMusic.play();
-
-            if (playPromise !== undefined) {
-
-                playPromise
-                    .then(() => {
-
-                        musicStarted = true;
-
-                        musicMuted = false;
-
-                        updateMusicButton();
-
-                    })
-                    .catch(error => {
-
-                        console.log(
-                            "Browser blocked autoplay:",
-                            error
-                        );
-
-                    });
-
-            }
-
-        }
-
-
-        /* ==================================================
-           MUSIC ON / OFF
-        ================================================== */
-
-        function toggleMusic() {
-
-            if (bgMusic.paused) {
-
-                musicMuted = false;
-
-                bgMusic.volume = 0.18;
-
-                bgMusic.play()
-                    .then(() => {
-
-                        musicStarted = true;
-
-                        updateMusicButton();
-
-                    })
-                    .catch(error => {
-
-                        console.log(
-                            "Unable to play music:",
-                            error
-                        );
-
-                    });
-
-            } else {
-
-                bgMusic.pause();
-
-                musicMuted = true;
-
-                updateMusicButton();
-
-            }
-
-        }
-
-
-        /* ==================================================
-           UPDATE MUSIC BUTTON
-        ================================================== */
-
-        function updateMusicButton() {
-
-            if (!musicButton || !musicIcon) {
-                return;
-            }
-
-
-            if (bgMusic.paused) {
-
-                musicIcon.className =
-                    "fa-solid fa-volume-xmark";
-
-                musicButton.classList.remove(
-                    "music-playing"
-                );
-
-                musicButton.classList.add(
-                    "music-off"
-                );
-
-            } else {
-
-                musicIcon.className =
-                    "fa-solid fa-volume-high";
-
-                musicButton.classList.remove(
-                    "music-off"
-                );
-
-                musicButton.classList.add(
-                    "music-playing"
-                );
-
-            }
-
-        }
-
-
-        /* ==================================================
-           START MUSIC AFTER USER INTERACTION
-        ================================================== */
-
-        document.addEventListener(
-            "click",
-            function () {
-
-                if (!musicStarted && !musicMuted) {
-                    startBackgroundMusic();
-                }
-
-            },
-            {
-                passive: true
-            }
-        );
-
-
-        document.addEventListener(
-            "touchstart",
-            function () {
-
-                if (!musicStarted && !musicMuted) {
-                    startBackgroundMusic();
-                }
-
-            },
-            {
-                passive: true
-            }
-        );
-
-
-        /* ==================================================
-           PAGE VISIBILITY
-        ================================================== */
-
-        document.addEventListener(
-            "visibilitychange",
-            function () {
-
-                if (
-                    !document.hidden &&
-                    musicStarted &&
-                    !musicMuted
-                ) {
-
-                    bgMusic.play()
-                        .catch(() => {});
-
-                }
-
-            }
-        );
-
-
-        /* ==================================================
-           CLICK SOUND
-        ================================================== */
-
-        function clickSound() {
-
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-
-
-            const osc =
-                audioCtx.createOscillator();
-
-            const gain =
-                audioCtx.createGain();
-
-
-            osc.connect(gain);
-
-            gain.connect(
-                audioCtx.destination
-            );
-
-
-            osc.type = 'sine';
-
-            osc.frequency.setValueAtTime(
-                600,
-                audioCtx.currentTime
-            );
-
-
-            gain.gain.setValueAtTime(
-                0.05,
-                audioCtx.currentTime
-            );
-
-
-            gain.gain.exponentialRampToValueAtTime(
-                0.001,
-                audioCtx.currentTime + 0.05
-            );
-
-
-            osc.start();
-
-            osc.stop(
-                audioCtx.currentTime + 0.05
-            );
-
-        }
-
-
-        /* ==================================================
-           ANSWER SOUND
-        ================================================== */
-
-        function playSound(type) {
-
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-
-
-            const osc =
-                audioCtx.createOscillator();
-
-            const gain =
-                audioCtx.createGain();
-
-
-            osc.connect(gain);
-
-            gain.connect(
-                audioCtx.destination
-            );
-
-
-            if (type === 'correct') {
-
-                osc.type = 'sine';
-
-                osc.frequency.setValueAtTime(
-                    523.25,
-                    audioCtx.currentTime
-                );
-
-
-                osc.frequency.exponentialRampToValueAtTime(
-                    880,
-                    audioCtx.currentTime + 0.15
-                );
-
-
-                gain.gain.setValueAtTime(
-                    0.2,
-                    audioCtx.currentTime
-                );
-
-
-                gain.gain.exponentialRampToValueAtTime(
-                    0.01,
-                    audioCtx.currentTime + 0.3
-                );
-
-
-                osc.start();
-
-                osc.stop(
-                    audioCtx.currentTime + 0.3
-                );
-
-            } else {
-
-                osc.type = 'sawtooth';
-
-                osc.frequency.setValueAtTime(
-                    180,
-                    audioCtx.currentTime
-                );
-
-
-                osc.frequency.setValueAtTime(
-                    110,
-                    audioCtx.currentTime + 0.1
-                );
-
-
-                gain.gain.setValueAtTime(
-                    0.2,
-                    audioCtx.currentTime
-                );
-
-
-                gain.gain.exponentialRampToValueAtTime(
-                    0.01,
-                    audioCtx.currentTime + 0.3
-                );
-
-
-                osc.start();
-
-                osc.stop(
-                    audioCtx.currentTime + 0.3
-                );
-
-            }
-
-        }
-
-
-        /* ==================================================
-           INTRO → PASSWORD
-        ================================================== */
-
-        function goToPasswordScreen() {
-
-            clickSound();
-
-
-            /*
-             * PLAY button itself is a user interaction.
-             * Therefore browser allows the audio to start.
-             */
-
-            startBackgroundMusic();
-
-
-            document
-                .getElementById('intro-screen')
-                .classList
-                .add('hidden');
-
-
-            document
-                .getElementById('password-screen')
-                .classList
-                .remove('hidden');
-
-
-            document
-                .getElementById('password-screen')
-                .classList
-                .add('flex');
-
-        }
-
-
-        /* ==================================================
-           PASSWORD CHECK
-        ================================================== */
-
-        function checkPassword() {
-
-            clickSound();
-
-
-            /*
-             * Make sure music continues
-             */
-
-            startBackgroundMusic();
-
-
-            const input =
-                document
-                    .getElementById('pass-input')
-                    .value
-                    .trim()
-                    .toLowerCase();
-
-
-            if (input === 'play dump') {
-
-                playSound('correct');
-
-
-                showFeedbackToast(
-                    true,
-                    "Welcome to DMC Master Plan!"
-                );
-
-
-                document
-                    .getElementById('password-screen')
-                    .classList
-                    .add('hidden');
-
-
-                document
-                    .getElementById('password-screen')
-                    .classList
-                    .remove('flex');
-
-
-                const mainApp =
-                    document.getElementById(
-                        'main-app'
-                    );
-
-
-                mainApp.classList.remove(
-                    'hidden'
-                );
-
-
-                mainApp.classList.add(
-                    'flex'
-                );
-
-
-                startSlideshow();
-
-                startBackgroundSlideshow();
-
-                updateSubjectCounts();
-
-
-                /*
-                 * Ensure music remains alive
-                 */
-
-                startBackgroundMusic();
-
-            } else {
-
-                playSound('wrong');
-
-
-                document
-                    .getElementById('pass-error')
-                    .classList
-                    .remove('hidden');
-
-            }
-
-        }
-
-
-        /* ==================================================
-           BANNER SLIDESHOW
-        ================================================== */
-
-        const slideshowImages = [
-            '29378_2.jpg',
-            '24676.jpg',
-            '9775.png',
-            '2134.jpg'
-        ];
-
-
-        let currentSlide = 0;
-
-
-        function startSlideshow() {
-
-            setInterval(() => {
-
-                currentSlide =
-                    (currentSlide + 1) %
-                    slideshowImages.length;
-
-
-                const imgEl =
-                    document.getElementById(
-                        'slideshow-img'
-                    );
-
-
-                if (imgEl) {
-
-                    imgEl.src =
-                        slideshowImages[
-                            currentSlide
-                        ];
-
-                }
-
-            }, 3500);
-
-        }
-
-
-        /* ==================================================
-           BACKGROUND SLIDESHOW
-        ================================================== */
-
-        function startBackgroundSlideshow() {
-
-            const bgSlides =
-                document.querySelectorAll(
-                    '.bg-slide-item'
-                );
-
-
-            if (!bgSlides.length) {
-                return;
-            }
-
-
-            let currentBgIndex = 0;
-
-
-            setInterval(() => {
-
-                bgSlides[
-                    currentBgIndex
-                ].classList.remove(
-                    'active'
-                );
-
-
-                currentBgIndex =
-                    (currentBgIndex + 1) %
-                    bgSlides.length;
-
-
-                bgSlides[
-                    currentBgIndex
-                ].classList.add(
-                    'active'
-                );
-
-
-            }, 4000);
-
-        }
-
-
-        /* ==================================================
-           FEEDBACK TOAST
-        ================================================== */
-
-        let toastTimeout;
-
-
-        function
+                <i class="

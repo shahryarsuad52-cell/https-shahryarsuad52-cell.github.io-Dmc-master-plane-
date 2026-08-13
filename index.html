@@ -3,14 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>DMC Master Plan - Medical Admission Prep</title>
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap');
-        * { font-family: 'Hind Siliguri', sans-serif; user-select: none; }
-        
+
+        * {
+            font-family: 'Hind Siliguri', sans-serif;
+            user-select: none;
+        }
+
         .glass-card {
             background: rgba(15, 23, 42, 0.85);
             backdrop-filter: blur(16px);
@@ -18,20 +30,45 @@
         }
 
         @keyframes pulseGlow {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 25px rgba(220, 38, 38, 0.5); }
-            50% { transform: scale(1.08); box-shadow: 0 0 45px rgba(220, 38, 38, 0.8); }
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 25px rgba(220, 38, 38, 0.5);
+            }
+
+            50% {
+                transform: scale(1.08);
+                box-shadow: 0 0 45px rgba(220, 38, 38, 0.8);
+            }
         }
-        .animate-pulse-glow { animation: pulseGlow 2s infinite ease-in-out; }
+
+        .animate-pulse-glow {
+            animation: pulseGlow 2s infinite ease-in-out;
+        }
 
         @keyframes fadeInDown {
-            from { opacity: 0; transform: translate(-50%, -20px); }
-            to { opacity: 1; transform: translate(-50%, 0); }
+            from {
+                opacity: 0;
+                transform: translate(-50%, -20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
         }
-        .toast-animate { animation: fadeInDown 0.4s ease forwards; }
 
-        .slide-fade { transition: opacity 1s ease-in-out; }
+        .toast-animate {
+            animation: fadeInDown 0.4s ease forwards;
+        }
 
-        /* --- SCREEN 3 BACKGROUND SMOOTH FADE SLIDESHOW STYLES --- */
+        .slide-fade {
+            transition: opacity 1s ease-in-out;
+        }
+
+        /* ==========================================
+           SCREEN 3 BACKGROUND SLIDESHOW
+        ========================================== */
+
         .screen-bg-slideshow {
             position: fixed;
             top: 0;
@@ -66,628 +103,2369 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle, rgba(15, 23, 42, 0.6) 0%, rgba(15, 23, 42, 0.95) 100%);
+
+            background:
+                radial-gradient(
+                    circle,
+                    rgba(15, 23, 42, 0.6) 0%,
+                    rgba(15, 23, 42, 0.95) 100%
+                );
+
             z-index: 1;
+        }
+
+        /* ==========================================
+           MUSIC BUTTON
+        ========================================== */
+
+        #music-control {
+            transition: all 0.25s ease;
+        }
+
+        #music-control.music-playing {
+            box-shadow:
+                0 0 15px rgba(239, 68, 68, 0.5),
+                0 0 30px rgba(239, 68, 68, 0.25);
+        }
+
+        #music-control.music-off {
+            opacity: 0.75;
+        }
+
+        @keyframes musicPulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.08);
+            }
+        }
+
+        .music-playing-animation {
+            animation: musicPulse 2s infinite ease-in-out;
         }
     </style>
 </head>
+
+
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between relative overflow-x-hidden">
 
-    <!-- DIRECT WORKING ONLINE BELIEVER AUDIO STREAM -->
+
+    <!-- =====================================================
+         🎵 PERSISTENT BACKGROUND MUSIC
+         ===================================================== -->
+
     <audio id="bg-music" loop preload="auto">
-        <source src="https://raw.githubusercontent.com/Anirban-Saha-001/Songs/main/Believer.mp3" type="audio/mpeg">
+        <source
+            src="https://raw.githubusercontent.com/Anirban-Saha-001/Songs/main/Believer.mp3"
+            type="audio/mpeg"
+        >
+        Your browser does not support audio.
     </audio>
 
-    <!-- FLOATING FEEDBACK TOAST -->
-    <div id="feedback-toast" class="fixed top-20 left-1/2 -translate-x-1/2 z-[120] hidden px-6 py-3 rounded-2xl text-center font-bold text-xs md:text-sm shadow-2xl backdrop-blur-md border transition-all duration-300 pointer-events-none">
+
+    <!-- =====================================================
+         🎵 MUSIC CONTROL BUTTON
+         ===================================================== -->
+
+    <button
+        id="music-control"
+        onclick="toggleMusic()"
+        aria-label="Toggle background music"
+        class="fixed bottom-5 right-5 z-[150]
+               w-12 h-12 rounded-full
+               bg-red-600/90 hover:bg-red-500
+               text-white
+               shadow-2xl
+               flex items-center justify-center
+               transition transform hover:scale-110
+               border border-red-400/30"
+    >
+        <i id="music-icon" class="fa-solid fa-volume-high"></i>
+    </button>
+
+
+    <!-- =====================================================
+         FEEDBACK TOAST
+         ===================================================== -->
+
+    <div
+        id="feedback-toast"
+        class="fixed top-20 left-1/2
+               -translate-x-1/2
+               z-[120]
+               hidden
+               px-6 py-3
+               rounded-2xl
+               text-center
+               font-bold
+               text-xs md:text-sm
+               shadow-2xl
+               backdrop-blur-md
+               border
+               transition-all duration-300
+               pointer-events-none"
+    >
         <span id="toast-text"></span>
     </div>
 
-    <!-- 1. INTRO SCREEN -->
-    <div id="intro-screen" class="fixed inset-0 bg-cover bg-center z-[100] flex flex-col items-center justify-between p-6 relative" style="background-image: url('dmc-gate.jpg');">
+
+    <!-- =====================================================
+         1. INTRO SCREEN
+         ===================================================== -->
+
+    <div
+        id="intro-screen"
+        class="fixed inset-0
+               bg-cover bg-center
+               z-[100]
+               flex flex-col
+               items-center
+               justify-between
+               p-6
+               relative"
+        style="background-image: url('dmc-gate.jpg');"
+    >
+
         <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-xs"></div>
 
+
         <div class="relative z-10 text-center mt-12">
-            <span class="bg-red-600/90 text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-lg">Target DMC 2026</span>
-            <h1 class="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-rose-300 to-amber-200 mt-3 drop-shadow-lg">
+
+            <span
+                class="bg-red-600/90
+                       text-white
+                       text-[11px]
+                       font-bold
+                       px-3 py-1
+                       rounded-full
+                       uppercase
+                       tracking-wider
+                       shadow-lg"
+            >
+                Target DMC 2026
+            </span>
+
+            <h1
+                class="text-3xl md:text-5xl
+                       font-extrabold
+                       text-transparent
+                       bg-clip-text
+                       bg-gradient-to-r
+                       from-red-500
+                       via-rose-300
+                       to-amber-200
+                       mt-3
+                       drop-shadow-lg"
+            >
                 DMC MASTER PLAN
             </h1>
-            <p class="text-slate-300 text-xs md:text-sm font-semibold tracking-widest uppercase mt-2 drop-shadow">
+
+            <p
+                class="text-slate-300
+                       text-xs md:text-sm
+                       font-semibold
+                       tracking-widest
+                       uppercase
+                       mt-2
+                       drop-shadow"
+            >
                 A Project by Rauha Shahryar Suad
             </p>
+
         </div>
+
 
         <div class="relative z-10 mb-16 text-center">
-            <button onclick="goToPasswordScreen()" class="bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-extrabold px-10 py-4 rounded-full shadow-2xl shadow-red-900/60 text-lg transition transform hover:scale-110 active:scale-95 flex items-center gap-3 mx-auto animate-pulse-glow">
-                <i class="fa-solid fa-play"></i> PLAY
+
+            <button
+                onclick="goToPasswordScreen()"
+                class="bg-gradient-to-r
+                       from-red-600
+                       to-rose-600
+                       hover:from-red-500
+                       hover:to-rose-500
+                       text-white
+                       font-extrabold
+                       px-10 py-4
+                       rounded-full
+                       shadow-2xl
+                       shadow-red-900/60
+                       text-lg
+                       transition
+                       transform
+                       hover:scale-110
+                       active:scale-95
+                       flex items-center
+                       gap-3
+                       mx-auto
+                       animate-pulse-glow"
+            >
+
+                <i class="fa-solid fa-play"></i>
+
+                PLAY
+
             </button>
+
         </div>
+
     </div>
 
-    <!-- 2. ISOLATED PASSWORD SCREEN -->
-    <div id="password-screen" class="fixed inset-0 z-[90] hidden flex-col items-center justify-center p-4 bg-cover bg-center relative" style="background-image: url('dmc-logo.jpg');">
+
+    <!-- =====================================================
+         2. PASSWORD SCREEN
+         ===================================================== -->
+
+    <div
+        id="password-screen"
+        class="fixed inset-0
+               z-[90]
+               hidden
+               flex-col
+               items-center
+               justify-center
+               p-4
+               bg-cover
+               bg-center
+               relative"
+        style="background-image: url('dmc-logo.jpg');"
+    >
+
         <div class="absolute inset-0 bg-slate-950 backdrop-blur-md"></div>
 
-        <div class="relative z-10 glass-card p-8 rounded-3xl max-w-md w-full text-center shadow-2xl border border-slate-700">
-            <div class="w-20 h-20 mx-auto mb-4 rounded-full border-2 border-red-500 overflow-hidden shadow-lg">
-                <img src="dmc-logo.jpg" alt="DMC Logo" class="w-full h-full object-cover" onError="this.src='https://via.placeholder.com/150?text=DMC'">
+
+        <div
+            class="relative z-10
+                   glass-card
+                   p-8
+                   rounded-3xl
+                   max-w-md
+                   w-full
+                   text-center
+                   shadow-2xl
+                   border
+                   border-slate-700"
+        >
+
+            <div
+                class="w-20 h-20
+                       mx-auto mb-4
+                       rounded-full
+                       border-2
+                       border-red-500
+                       overflow-hidden
+                       shadow-lg"
+            >
+
+                <img
+                    src="dmc-logo.jpg"
+                    alt="DMC Logo"
+                    class="w-full h-full object-cover"
+                    onError="this.src='https://via.placeholder.com/150?text=DMC'"
+                >
+
             </div>
-            <h2 class="text-xl font-bold text-slate-100 mb-1">পাসওয়ার্ড প্রদান করুন</h2>
-            <p class="text-xs text-slate-400 mb-6">ওয়েবসাইটে এক্সেস পেতে সিক্রেট কি দিন</p>
-            
-            <input type="password" id="pass-input" placeholder="Enter password..." class="w-full bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-3 text-center text-sm text-white focus:outline-none focus:border-red-500 mb-4 tracking-wider">
-            
-            <button onclick="checkPassword()" class="w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold py-3 rounded-xl shadow-lg transition">
+
+
+            <h2 class="text-xl font-bold text-slate-100 mb-1">
+                পাসওয়ার্ড প্রদান করুন
+            </h2>
+
+            <p class="text-xs text-slate-400 mb-6">
+                ওয়েবসাইটে এক্সেস পেতে সিক্রেট কি দিন
+            </p>
+
+
+            <input
+                type="password"
+                id="pass-input"
+                placeholder="Enter password..."
+                class="w-full
+                       bg-slate-900/90
+                       border
+                       border-slate-700
+                       rounded-xl
+                       px-4 py-3
+                       text-center
+                       text-sm
+                       text-white
+                       focus:outline-none
+                       focus:border-red-500
+                       mb-4
+                       tracking-wider"
+                onkeydown="if(event.key === 'Enter') checkPassword();"
+            >
+
+
+            <button
+                onclick="checkPassword()"
+                class="w-full
+                       bg-gradient-to-r
+                       from-red-600
+                       to-rose-600
+                       hover:from-red-500
+                       hover:to-rose-500
+                       text-white
+                       font-bold
+                       py-3
+                       rounded-xl
+                       shadow-lg
+                       transition"
+            >
                 আনলক করুন
             </button>
-            <p id="pass-error" class="text-red-400 text-xs mt-3 hidden">ভুল পাসওয়ার্ড! সঠিক পাসওয়ার্ড দিয়ে চেষ্টা করুন।</p>
+
+
+            <p
+                id="pass-error"
+                class="text-red-400
+                       text-xs
+                       mt-3
+                       hidden"
+            >
+                ভুল পাসওয়ার্ড! সঠিক পাসওয়ার্ড দিয়ে চেষ্টা করুন।
+            </p>
+
         </div>
+
     </div>
 
-    <!-- 3. MAIN PRACTICE WEBSITE -->
-    <div id="main-app" class="hidden flex-col justify-between min-h-screen relative z-10">
-        
-        <!-- FADED SMOOTH BACKGROUND SLIDESHOW FOR SCREEN 3 -->
+
+    <!-- =====================================================
+         3. MAIN APPLICATION
+         ===================================================== -->
+
+    <div
+        id="main-app"
+        class="hidden
+               flex-col
+               justify-between
+               min-h-screen
+               relative
+               z-10"
+    >
+
+
+        <!-- BACKGROUND SLIDESHOW -->
+
         <div class="screen-bg-slideshow">
-            <div class="bg-slide-item active" style="background-image: url('29378_2.jpg');"></div>
-            <div class="bg-slide-item" style="background-image: url('29485_2.jpg');"></div>
-            <div class="bg-slide-item" style="background-image: url('24676.jpg');"></div>
-            <div class="bg-slide-item" style="background-image: url('2134.jpg');"></div>
-            <div class="bg-slide-item" style="background-image: url('7206.jpg');"></div>
-            <div class="bg-slide-item" style="background-image: url('9775.png');"></div>
-            <div class="bg-slide-item" style="background-image: url('21427_2.jpg');"></div>
-            <div class="bg-slide-item" style="background-image: url('21538.jpg');"></div>
-            <div class="bg-slide-item" style="background-image: url('32134.png');"></div>
-            <div class="bg-slide-item" style="background-image: url('32341.jpg');"></div>
+
+            <div
+                class="bg-slide-item active"
+                style="background-image: url('29378_2.jpg');"
+            ></div>
+
+            <div
+                class="bg-slide-item"
+                style="background-image: url('29485_2.jpg');"
+            ></div>
+
+            <div
+                class="bg-slide-item"
+                style="background-image: url('24676.jpg');"
+            ></div>
+
+            <div
+                class="bg-slide-item"
+                style="background-image: url('2134.jpg');"
+            ></div>
+
+            <div
+                class="bg-slide-item"
+                style="background-image: url('7206.jpg');"
+            ></div>
+
+            <div
+                class="bg-slide-item"
+                style="background-image: url('9775.png');"
+            ></div>
+
+            <div
+                class="bg-slide-item"
+                style="background-image: url('21427_2.jpg');"
+            ></div>
+
+            <div
+                class="bg-slide-item"
+                style="background-image: url('21538.jpg');"
+            ></div>
+
+            <div
+                class="bg-slide-item"
+                style="background-image: url('32134.png');"
+            ></div>
+
+            <div
+                class="bg-slide-item"
+                style="background-image: url('32341.jpg');"
+            ></div>
+
             <div class="bg-slide-overlay"></div>
+
         </div>
 
-        <!-- HEADER -->
-        <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40">
-            <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
-                <div class="flex items-center gap-3 cursor-pointer" onclick="clickSound(); showSubjects();">
-                    <div class="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center text-white text-xl shadow-lg shadow-red-900/40">
+
+        <!-- =================================================
+             HEADER
+             ================================================= -->
+
+        <header
+            class="bg-slate-900/90
+                   backdrop-blur-md
+                   border-b
+                   border-slate-800
+                   sticky
+                   top-0
+                   z-40"
+        >
+
+            <div
+                class="max-w-5xl
+                       mx-auto
+                       px-4
+                       py-3
+                       flex
+                       justify-between
+                       items-center"
+            >
+
+                <div
+                    class="flex
+                           items-center
+                           gap-3
+                           cursor-pointer"
+                    onclick="clickSound(); showSubjects();"
+                >
+
+                    <div
+                        class="w-10 h-10
+                               bg-red-600
+                               rounded-xl
+                               flex
+                               items-center
+                               justify-center
+                               text-white
+                               text-xl
+                               shadow-lg
+                               shadow-red-900/40"
+                    >
+
                         <i class="fa-solid fa-stethoscope"></i>
+
                     </div>
+
+
                     <div>
-                        <h1 class="text-base font-bold text-red-500 leading-none">DMC MASTER PLAN</h1>
-                        <span class="text-[10px] text-slate-400">By Rauha Shahryar Suad</span>
+
+                        <h1
+                            class="text-base
+                                   font-bold
+                                   text-red-500
+                                   leading-none"
+                        >
+                            DMC MASTER PLAN
+                        </h1>
+
+                        <span
+                            class="text-[10px]
+                                   text-slate-400"
+                        >
+                            By Rauha Shahryar Suad
+                        </span>
+
                     </div>
+
                 </div>
+
 
                 <div class="relative">
-                    <button onclick="clickSound(); toggleMenu();" class="w-10 h-10 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl flex items-center justify-center text-lg transition">
+
+                    <button
+                        onclick="clickSound(); toggleMenu();"
+                        class="w-10 h-10
+                               bg-slate-800
+                               hover:bg-slate-700
+                               text-slate-200
+                               rounded-xl
+                               flex
+                               items-center
+                               justify-center
+                               text-lg
+                               transition"
+                    >
+
                         <i class="fa-solid fa-ellipsis-vertical"></i>
+
                     </button>
-                    
-                    <div id="dropdown-menu" class="hidden absolute right-0 mt-2 w-48 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl py-2 z-50">
-                        <button onclick="clickSound(); openAddModal(); toggleMenu();" class="w-full text-left px-4 py-2.5 text-xs font-semibold text-slate-200 hover:bg-red-600/20 hover:text-red-400 flex items-center gap-2">
-                            <i class="fa-solid fa-plus-circle"></i> নতুন প্রশ্ন যোগ করুন
+
+
+                    <div
+                        id="dropdown-menu"
+                        class="hidden
+                               absolute
+                               right-0
+                               mt-2
+                               w-48
+                               bg-slate-900
+                               border
+                               border-slate-700
+                               rounded-xl
+                               shadow-2xl
+                               py-2
+                               z-50"
+                    >
+
+                        <button
+                            onclick="clickSound(); openAddModal(); toggleMenu();"
+                            class="w-full
+                                   text-left
+                                   px-4 py-2.5
+                                   text-xs
+                                   font-semibold
+                                   text-slate-200
+                                   hover:bg-red-600/20
+                                   hover:text-red-400
+                                   flex
+                                   items-center
+                                   gap-2"
+                        >
+
+                            <i class="fa-solid fa-plus-circle"></i>
+
+                            নতুন প্রশ্ন যোগ করুন
+
                         </button>
+
                     </div>
+
                 </div>
+
             </div>
+
         </header>
 
-        <!-- MAIN CONTENT AREA -->
-        <main class="max-w-4xl mx-auto px-4 py-6 flex-grow w-full relative z-10">
+
+        <!-- =================================================
+             MAIN CONTENT
+             ================================================= -->
+
+        <main
+            class="max-w-4xl
+                   mx-auto
+                   px-4
+                   py-6
+                   flex-grow
+                   w-full
+                   relative
+                   z-10"
+        >
+
+
+            <!-- SUBJECT VIEW -->
 
             <div id="subject-view">
-                <div class="relative w-full h-44 md:h-56 rounded-2xl overflow-hidden mb-8 shadow-2xl border border-slate-800">
-                    <img id="slideshow-img" src="29378_2.jpg" class="w-full h-full object-cover slide-fade" onError="this.src='https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=80'">
-                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
-                    <div class="absolute bottom-3 left-4 right-4 text-left">
-                        <span class="bg-red-600/80 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Medical Admission</span>
-                        <h3 class="text-sm md:text-lg font-bold text-slate-100 mt-1">স্বপ্নের ঢাকা মেডিকেল কলেজ প্রিপারেশন</h3>
+
+                <div
+                    class="relative
+                           w-full
+                           h-44 md:h-56
+                           rounded-2xl
+                           overflow-hidden
+                           mb-8
+                           shadow-2xl
+                           border
+                           border-slate-800"
+                >
+
+                    <img
+                        id="slideshow-img"
+                        src="29378_2.jpg"
+                        class="w-full h-full object-cover slide-fade"
+                        onError="this.src='https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=80'"
+                    >
+
+                    <div
+                        class="absolute
+                               inset-0
+                               bg-gradient-to-t
+                               from-slate-950
+                               via-transparent
+                               to-transparent"
+                    ></div>
+
+
+                    <div
+                        class="absolute
+                               bottom-3
+                               left-4
+                               right-4
+                               text-left"
+                    >
+
+                        <span
+                            class="bg-red-600/80
+                                   text-white
+                                   text-[10px]
+                                   font-bold
+                                   px-2
+                                   py-0.5
+                                   rounded-full
+                                   uppercase"
+                        >
+                            Medical Admission
+                        </span>
+
+                        <h3
+                            class="text-sm md:text-lg
+                                   font-bold
+                                   text-slate-100
+                                   mt-1"
+                        >
+                            স্বপ্নের ঢাকা মেডিকেল কলেজ প্রিপারেশন
+                        </h3>
+
                     </div>
+
                 </div>
+
 
                 <div class="text-center mb-6">
-                    <h2 class="text-2xl font-extrabold text-slate-100">বিষয় নির্বাচন করুন</h2>
+
+                    <h2
+                        class="text-2xl
+                               font-extrabold
+                               text-slate-100"
+                    >
+                        বিষয় নির্বাচন করুন
+                    </h2>
+
                 </div>
 
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8 justify-items-center">
-                    <div onclick="clickSound(); selectSubject('Biology')" class="cursor-pointer group flex flex-col items-center w-full">
-                        <div class="w-20 h-20 md:w-24 md:h-24 rounded-full bg-slate-900 border-2 border-emerald-500/40 group-hover:border-emerald-400 group-hover:scale-105 transition flex items-center justify-center text-3xl shadow-lg relative">
-                            🧬 <span id="badge-Biology" class="absolute -top-1 -right-1 bg-emerald-500 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
+
+                <div
+                    class="grid
+                           grid-cols-2
+                           md:grid-cols-3
+                           lg:grid-cols-5
+                           gap-4
+                           mb-8
+                           justify-items-center"
+                >
+
+
+                    <!-- BIOLOGY -->
+
+                    <div
+                        onclick="clickSound(); selectSubject('Biology')"
+                        class="cursor-pointer
+                               group
+                               flex
+                               flex-col
+                               items-center
+                               w-full"
+                    >
+
+                        <div
+                            class="w-20 h-20
+                                   md:w-24 md:h-24
+                                   rounded-full
+                                   bg-slate-900
+                                   border-2
+                                   border-emerald-500/40
+                                   group-hover:border-emerald-400
+                                   group-hover:scale-105
+                                   transition
+                                   flex
+                                   items-center
+                                   justify-center
+                                   text-3xl
+                                   shadow-lg
+                                   relative"
+                        >
+
+                            🧬
+
+                            <span
+                                id="badge-Biology"
+                                class="absolute
+                                       -top-1
+                                       -right-1
+                                       bg-emerald-500
+                                       text-slate-950
+                                       text-[10px]
+                                       font-bold
+                                       px-2
+                                       py-0.5
+                                       rounded-full"
+                            >
+                                0
+                            </span>
+
                         </div>
-                        <h3 class="mt-2 font-bold text-xs md:text-sm text-slate-200 group-hover:text-emerald-400">জীববিজ্ঞান</h3>
+
+
+                        <h3
+                            class="mt-2
+                                   font-bold
+                                   text-xs md:text-sm
+                                   text-slate-200
+                                   group-hover:text-emerald-400"
+                        >
+                            জীববিজ্ঞান
+                        </h3>
+
                     </div>
 
-                    <div onclick="clickSound(); selectSubject('Chemistry')" class="cursor-pointer group flex flex-col items-center w-full">
-                        <div class="w-20 h-20 md:w-24 md:h-24 rounded-full bg-slate-900 border-2 border-cyan-500/40 group-hover:border-cyan-400 group-hover:scale-105 transition flex items-center justify-center text-3xl shadow-lg relative">
-                            🧪 <span id="badge-Chemistry" class="absolute -top-1 -right-1 bg-cyan-500 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
+
+                    <!-- CHEMISTRY -->
+
+                    <div
+                        onclick="clickSound(); selectSubject('Chemistry')"
+                        class="cursor-pointer
+                               group
+                               flex
+                               flex-col
+                               items-center
+                               w-full"
+                    >
+
+                        <div
+                            class="w-20 h-20
+                                   md:w-24 md:h-24
+                                   rounded-full
+                                   bg-slate-900
+                                   border-2
+                                   border-cyan-500/40
+                                   group-hover:border-cyan-400
+                                   group-hover:scale-105
+                                   transition
+                                   flex
+                                   items-center
+                                   justify-center
+                                   text-3xl
+                                   shadow-lg
+                                   relative"
+                        >
+
+                            🧪
+
+                            <span
+                                id="badge-Chemistry"
+                                class="absolute
+                                       -top-1
+                                       -right-1
+                                       bg-cyan-500
+                                       text-slate-950
+                                       text-[10px]
+                                       font-bold
+                                       px-2
+                                       py-0.5
+                                       rounded-full"
+                            >
+                                0
+                            </span>
+
                         </div>
-                        <h3 class="mt-2 font-bold text-xs md:text-sm text-slate-200 group-hover:text-cyan-400">রসায়ন</h3>
+
+
+                        <h3
+                            class="mt-2
+                                   font-bold
+                                   text-xs md:text-sm
+                                   text-slate-200
+                                   group-hover:text-cyan-400"
+                        >
+                            রসায়ন
+                        </h3>
+
                     </div>
 
-                    <div onclick="clickSound(); selectSubject('Physics')" class="cursor-pointer group flex flex-col items-center w-full">
-                        <div class="w-20 h-20 md:w-24 md:h-24 rounded-full bg-slate-900 border-2 border-blue-500/40 group-hover:border-blue-400 group-hover:scale-105 transition flex items-center justify-center text-3xl shadow-lg relative">
-                            ⚛️ <span id="badge-Physics" class="absolute -top-1 -right-1 bg-blue-500 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
+
+                    <!-- PHYSICS -->
+
+                    <div
+                        onclick="clickSound(); selectSubject('Physics')"
+                        class="cursor-pointer
+                               group
+                               flex
+                               flex-col
+                               items-center
+                               w-full"
+                    >
+
+                        <div
+                            class="w-20 h-20
+                                   md:w-24 md:h-24
+                                   rounded-full
+                                   bg-slate-900
+                                   border-2
+                                   border-blue-500/40
+                                   group-hover:border-blue-400
+                                   group-hover:scale-105
+                                   transition
+                                   flex
+                                   items-center
+                                   justify-center
+                                   text-3xl
+                                   shadow-lg
+                                   relative"
+                        >
+
+                            ⚛️
+
+                            <span
+                                id="badge-Physics"
+                                class="absolute
+                                       -top-1
+                                       -right-1
+                                       bg-blue-500
+                                       text-slate-950
+                                       text-[10px]
+                                       font-bold
+                                       px-2
+                                       py-0.5
+                                       rounded-full"
+                            >
+                                0
+                            </span>
+
                         </div>
-                        <h3 class="mt-2 font-bold text-xs md:text-sm text-slate-200 group-hover:text-blue-400">পদার্থবিজ্ঞান</h3>
+
+
+                        <h3
+                            class="mt-2
+                                   font-bold
+                                   text-xs md:text-sm
+                                   text-slate-200
+                                   group-hover:text-blue-400"
+                        >
+                            পদার্থবিজ্ঞান
+                        </h3>
+
                     </div>
 
-                    <div onclick="clickSound(); selectSubject('English')" class="cursor-pointer group flex flex-col items-center w-full">
-                        <div class="w-20 h-20 md:w-24 md:h-24 rounded-full bg-slate-900 border-2 border-amber-500/40 group-hover:border-amber-400 group-hover:scale-105 transition flex items-center justify-center text-3xl shadow-lg relative">
-                            📚 <span id="badge-English" class="absolute -top-1 -right-1 bg-amber-500 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
+
+                    <!-- ENGLISH -->
+
+                    <div
+                        onclick="clickSound(); selectSubject('English')"
+                        class="cursor-pointer
+                               group
+                               flex
+                               flex-col
+                               items-center
+                               w-full"
+                    >
+
+                        <div
+                            class="w-20 h-20
+                                   md:w-24 md:h-24
+                                   rounded-full
+                                   bg-slate-900
+                                   border-2
+                                   border-amber-500/40
+                                   group-hover:border-amber-400
+                                   group-hover:scale-105
+                                   transition
+                                   flex
+                                   items-center
+                                   justify-center
+                                   text-3xl
+                                   shadow-lg
+                                   relative"
+                        >
+
+                            📚
+
+                            <span
+                                id="badge-English"
+                                class="absolute
+                                       -top-1
+                                       -right-1
+                                       bg-amber-500
+                                       text-slate-950
+                                       text-[10px]
+                                       font-bold
+                                       px-2
+                                       py-0.5
+                                       rounded-full"
+                            >
+                                0
+                            </span>
+
                         </div>
-                        <h3 class="mt-2 font-bold text-xs md:text-sm text-slate-200 group-hover:text-amber-400">ইংরেজি (BCS)</h3>
+
+
+                        <h3
+                            class="mt-2
+                                   font-bold
+                                   text-xs md:text-sm
+                                   text-slate-200
+                                   group-hover:text-amber-400"
+                        >
+                            ইংরেজি (BCS)
+                        </h3>
+
                     </div>
 
-                    <div onclick="clickSound(); selectSubject('GK')" class="cursor-pointer group flex flex-col items-center w-full col-span-2 md:col-span-1">
-                        <div class="w-20 h-20 md:w-24 md:h-24 rounded-full bg-slate-900 border-2 border-purple-500/40 group-hover:border-purple-400 group-hover:scale-105 transition flex items-center justify-center text-3xl shadow-lg relative">
-                            🧠 <span id="badge-GK" class="absolute -top-1 -right-1 bg-purple-500 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded-full">0</span>
+
+                    <!-- GK -->
+
+                    <div
+                        onclick="clickSound(); selectSubject('GK')"
+                        class="cursor-pointer
+                               group
+                               flex
+                               flex-col
+                               items-center
+                               w-full
+                               col-span-2
+                               md:col-span-1"
+                    >
+
+                        <div
+                            class="w-20 h-20
+                                   md:w-24 md:h-24
+                                   rounded-full
+                                   bg-slate-900
+                                   border-2
+                                   border-purple-500/40
+                                   group-hover:border-purple-400
+                                   group-hover:scale-105
+                                   transition
+                                   flex
+                                   items-center
+                                   justify-center
+                                   text-3xl
+                                   shadow-lg
+                                   relative"
+                        >
+
+                            🧠
+
+                            <span
+                                id="badge-GK"
+                                class="absolute
+                                       -top-1
+                                       -right-1
+                                       bg-purple-500
+                                       text-slate-950
+                                       text-[10px]
+                                       font-bold
+                                       px-2
+                                       py-0.5
+                                       rounded-full"
+                            >
+                                0
+                            </span>
+
                         </div>
-                        <h3 class="mt-2 font-bold text-xs md:text-sm text-slate-200 group-hover:text-purple-400">সাধারণ জ্ঞান (BCS)</h3>
+
+
+                        <h3
+                            class="mt-2
+                                   font-bold
+                                   text-xs md:text-sm
+                                   text-slate-200
+                                   group-hover:text-purple-400"
+                        >
+                            সাধারণ জ্ঞান (BCS)
+                        </h3>
+
                     </div>
+
                 </div>
 
-                <div class="glass-card rounded-2xl p-5 border border-red-900/40 text-center relative overflow-hidden">
-                    <div class="flex items-center justify-center gap-2 mb-2">
-                        <span class="text-2xl">⚔️</span>
-                        <h3 class="text-lg font-bold text-red-400">1-vs-1 Battle Mode</h3>
+
+                <!-- BATTLE -->
+
+                <div
+                    class="glass-card
+                           rounded-2xl
+                           p-5
+                           border
+                           border-red-900/40
+                           text-center
+                           relative
+                           overflow-hidden"
+                >
+
+                    <div
+                        class="flex
+                               items-center
+                               justify-center
+                               gap-2
+                               mb-2"
+                    >
+
+                        <span class="text-2xl">
+                            ⚔️
+                        </span>
+
+                        <h3
+                            class="text-lg
+                                   font-bold
+                                   text-red-400"
+                        >
+                            1-vs-1 Battle Mode
+                        </h3>
+
                     </div>
-                    <p class="text-xs text-slate-400 mb-4">সাবজেক্ট ও প্রশ্ন সংখ্যা চয়ন করে বন্ধুর সাথে লাইভ ব্যাটল খেলুন!</p>
-                    <button onclick="clickSound(); openBattleModal();" class="bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white text-xs font-bold px-6 py-2.5 rounded-xl shadow-lg transition">
+
+
+                    <p
+                        class="text-xs
+                               text-slate-400
+                               mb-4"
+                    >
+                        সাবজেক্ট ও প্রশ্ন সংখ্যা চয়ন করে বন্ধুর সাথে লাইভ ব্যাটল খেলুন!
+                    </p>
+
+
+                    <button
+                        onclick="clickSound(); openBattleModal();"
+                        class="bg-gradient-to-r
+                               from-red-600
+                               to-amber-600
+                               hover:from-red-500
+                               hover:to-amber-500
+                               text-white
+                               text-xs
+                               font-bold
+                               px-6 py-2.5
+                               rounded-xl
+                               shadow-lg
+                               transition"
+                    >
                         ব্যাটল চ্যালেঞ্জ শুরু করুন
                     </button>
+
                 </div>
+
             </div>
+
+
+            <!-- =================================================
+                 QUIZ VIEW
+                 ================================================= -->
 
             <div id="quiz-view" class="hidden">
-                <div class="flex items-center justify-between mb-4">
-                    <button onclick="clickSound(); showSubjects();" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition">
-                        <i class="fa-solid fa-arrow-left"></i> বিষয়ে ফিরুন
+
+                <div
+                    class="flex
+                           items-center
+                           justify-between
+                           mb-4"
+                >
+
+                    <button
+                        onclick="clickSound(); showSubjects();"
+                        class="text-xs
+                               bg-slate-800
+                               hover:bg-slate-700
+                               text-slate-300
+                               px-3 py-1.5
+                               rounded-lg
+                               flex
+                               items-center
+                               gap-1.5
+                               transition"
+                    >
+
+                        <i class="fa-solid fa-arrow-left"></i>
+
+                        বিষয়ে ফিরুন
+
                     </button>
+
+
                     <div class="flex items-center gap-2">
-                        <span id="streak-counter" class="text-xs font-bold px-2.5 py-1 rounded-full bg-amber-950/80 border border-amber-600 text-amber-300">
+
+                        <span
+                            id="streak-counter"
+                            class="text-xs
+                                   font-bold
+                                   px-2.5 py-1
+                                   rounded-full
+                                   bg-amber-950/80
+                                   border
+                                   border-amber-600
+                                   text-amber-300"
+                        >
                             🔥 Streak: 0
                         </span>
-                        <span id="active-subject-badge" class="text-xs font-bold px-3 py-1 rounded-full bg-red-950/60 border border-red-800 text-red-400">
+
+
+                        <span
+                            id="active-subject-badge"
+                            class="text-xs
+                                   font-bold
+                                   px-3 py-1
+                                   rounded-full
+                                   bg-red-950/60
+                                   border
+                                   border-red-800
+                                   text-red-400"
+                        >
                             Biology
                         </span>
+
                     </div>
+
                 </div>
 
-                <div id="college-banner" class="hidden mb-4 p-3 bg-gradient-to-r from-amber-600 to-red-600 text-white font-extrabold text-center rounded-xl text-xs md:text-sm shadow-xl animate-bounce">
-                    🎉 <span id="college-name">Allotted College: Sir Salimullah Medical College</span>
+
+                <div
+                    id="college-banner"
+                    class="hidden
+                           mb-4
+                           p-3
+                           bg-gradient-to-r
+                           from-amber-600
+                           to-red-600
+                           text-white
+                           font-extrabold
+                           text-center
+                           rounded-xl
+                           text-xs md:text-sm
+                           shadow-xl
+                           animate-bounce"
+                >
+
+                    🎉
+
+                    <span id="college-name">
+                        Allotted College: Sir Salimullah Medical College
+                    </span>
+
                 </div>
 
-                <div id="single-question-card" class="glass-card rounded-2xl p-6 transition-all duration-300">
+
+                <div
+                    id="single-question-card"
+                    class="glass-card
+                           rounded-2xl
+                           p-6
+                           transition-all
+                           duration-300"
+                >
                 </div>
 
-                <div id="next-btn-container" class="hidden mt-6 text-right">
-                    <button onclick="clickSound(); loadNextQuestion();" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold px-6 py-2.5 rounded-xl text-sm shadow-lg transition">
-                        পরবর্তী প্রশ্ন <i class="fa-solid fa-arrow-right ml-1"></i>
+
+                <div
+                    id="next-btn-container"
+                    class="hidden
+                           mt-6
+                           text-right"
+                >
+
+                    <button
+                        onclick="clickSound(); loadNextQuestion();"
+                        class="bg-gradient-to-r
+                               from-emerald-600
+                               to-teal-600
+                               hover:from-emerald-500
+                               hover:to-teal-500
+                               text-white
+                               font-bold
+                               px-6 py-2.5
+                               rounded-xl
+                               text-sm
+                               shadow-lg
+                               transition"
+                    >
+
+                        পরবর্তী প্রশ্ন
+
+                        <i class="fa-solid fa-arrow-right ml-1"></i>
+
                     </button>
+
                 </div>
+
             </div>
+
         </main>
 
-        <footer class="bg-slate-900/40 border-t border-slate-800/80 py-3 text-center text-[11px] text-slate-500 mt-auto relative z-10">
+
+        <!-- FOOTER -->
+
+        <footer
+            class="bg-slate-900/40
+                   border-t
+                   border-slate-800/80
+                   py-3
+                   text-center
+                   text-[11px]
+                   text-slate-500
+                   mt-auto
+                   relative
+                   z-10"
+        >
             DMC Master Plan &copy; 2026 - Designed for Medical Aspirants
         </footer>
+
     </div>
 
-    <!-- MODALS -->
-    <div id="add-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-        <div class="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-lg shadow-2xl relative">
-            <div class="flex justify-between items-center mb-4 border-b border-slate-800 pb-3">
-                <h3 class="text-base font-bold text-slate-100 flex items-center gap-2">
-                    <i class="fa-solid fa-pen-to-square text-red-500"></i> নতুন প্রশ্ন যোগ করুন
+
+    <!-- =====================================================
+         ADD QUESTION MODAL
+         ===================================================== -->
+
+    <div
+        id="add-modal"
+        class="fixed
+               inset-0
+               bg-black/80
+               backdrop-blur-sm
+               hidden
+               items-center
+               justify-center
+               p-4
+               z-50"
+    >
+
+        <div
+            class="bg-slate-900
+                   border
+                   border-slate-700
+                   rounded-2xl
+                   p-6
+                   w-full
+                   max-w-lg
+                   shadow-2xl
+                   relative"
+        >
+
+            <div
+                class="flex
+                       justify-between
+                       items-center
+                       mb-4
+                       border-b
+                       border-slate-800
+                       pb-3"
+            >
+
+                <h3
+                    class="text-base
+                           font-bold
+                           text-slate-100
+                           flex
+                           items-center
+                           gap-2"
+                >
+
+                    <i class="fa-solid fa-pen-to-square text-red-500"></i>
+
+                    নতুন প্রশ্ন যোগ করুন
+
                 </h3>
-                <button onclick="clickSound(); closeAddModal();" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+
+
+                <button
+                    onclick="clickSound(); closeAddModal();"
+                    class="text-slate-400 hover:text-white"
+                >
+
+                    <i class="fa-solid fa-xmark text-xl"></i>
+
+                </button>
+
             </div>
-            
-            <form id="add-mcq-form" onsubmit="saveQuestion(event)" class="space-y-3">
+
+
+            <form
+                id="add-mcq-form"
+                onsubmit="saveQuestion(event)"
+                class="space-y-3"
+            >
+
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">বিষয়</label>
-                    <select id="input-subject" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-xs text-white">
-                        <option value="Biology">জীববিজ্ঞান</option>
-                        <option value="Chemistry">রসায়ন</option>
-                        <option value="Physics">পদার্থবিজ্ঞান</option>
-                        <option value="English">ইংরেজি (BCS)</option>
-                        <option value="GK">সাধারণ জ্ঞান (BCS)</option>
+
+                    <label
+                        class="block
+                               text-xs
+                               text-slate-400
+                               mb-1"
+                    >
+                        বিষয়
+                    </label>
+
+
+                    <select
+                        id="input-subject"
+                        class="w-full
+                               bg-slate-950
+                               border
+                               border-slate-700
+                               rounded-xl
+                               p-2.5
+                               text-xs
+                               text-white"
+                    >
+
+                        <option value="Biology">
+                            জীববিজ্ঞান
+                        </option>
+
+                        <option value="Chemistry">
+                            রসায়ন
+                        </option>
+
+                        <option value="Physics">
+                            পদার্থবিজ্ঞান
+                        </option>
+
+                        <option value="English">
+                            ইংরেজি (BCS)
+                        </option>
+
+                        <option value="GK">
+                            সাধারণ জ্ঞান (BCS)
+                        </option>
+
                     </select>
+
                 </div>
+
+
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">প্রশ্ন</label>
-                    <textarea id="input-question" required class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2 text-xs text-white" rows="2"></textarea>
+
+                    <label
+                        class="block
+                               text-xs
+                               text-slate-400
+                               mb-1"
+                    >
+                        প্রশ্ন
+                    </label>
+
+
+                    <textarea
+                        id="input-question"
+                        required
+                        class="w-full
+                               bg-slate-950
+                               border
+                               border-slate-700
+                               rounded-xl
+                               p-2
+                               text-xs
+                               text-white"
+                        rows="2"
+                    ></textarea>
+
                 </div>
+
+
                 <div class="grid grid-cols-2 gap-2">
-                    <input type="text" id="opt-0" placeholder="অপশন ১" required class="bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-white">
-                    <input type="text" id="opt-1" placeholder="অপশন ২" required class="bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-white">
-                    <input type="text" id="opt-2" placeholder="অপশন ৩" required class="bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-white">
-                    <input type="text" id="opt-3" placeholder="অপশন ৪" required class="bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-white">
+
+                    <input
+                        type="text"
+                        id="opt-0"
+                        placeholder="অপশন ১"
+                        required
+                        class="bg-slate-950
+                               border
+                               border-slate-700
+                               rounded-lg
+                               p-2
+                               text-xs
+                               text-white"
+                    >
+
+                    <input
+                        type="text"
+                        id="opt-1"
+                        placeholder="অপশন ২"
+                        required
+                        class="bg-slate-950
+                               border
+                               border-slate-700
+                               rounded-lg
+                               p-2
+                               text-xs
+                               text-white"
+                    >
+
+                    <input
+                        type="text"
+                        id="opt-2"
+                        placeholder="অপশন ৩"
+                        required
+                        class="bg-slate-950
+                               border
+                               border-slate-700
+                               rounded-lg
+                               p-2
+                               text-xs
+                               text-white"
+                    >
+
+                    <input
+                        type="text"
+                        id="opt-3"
+                        placeholder="অপশন ৪"
+                        required
+                        class="bg-slate-950
+                               border
+                               border-slate-700
+                               rounded-lg
+                               p-2
+                               text-xs
+                               text-white"
+                    >
+
                 </div>
+
+
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">সঠিক উত্তর</label>
-                    <select id="input-correct" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2 text-xs text-white">
-                        <option value="0">অপশন ১</option>
-                        <option value="1">অপশন ২</option>
-                        <option value="2">অপশন ৩</option>
-                        <option value="3">অপশন ৪</option>
+
+                    <label
+                        class="block
+                               text-xs
+                               text-slate-400
+                               mb-1"
+                    >
+                        সঠিক উত্তর
+                    </label>
+
+
+                    <select
+                        id="input-correct"
+                        class="w-full
+                               bg-slate-950
+                               border
+                               border-slate-700
+                               rounded-xl
+                               p-2
+                               text-xs
+                               text-white"
+                    >
+
+                        <option value="0">
+                            অপশন ১
+                        </option>
+
+                        <option value="1">
+                            অপশন ২
+                        </option>
+
+                        <option value="2">
+                            অপশন ৩
+                        </option>
+
+                        <option value="3">
+                            অপশন ৪
+                        </option>
+
                     </select>
+
                 </div>
+
+
                 <div>
-                    <input type="text" id="input-explanation" placeholder="সংক্ষিপ্ত ব্যাখ্যা (Optional)" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2 text-xs text-white">
+
+                    <input
+                        type="text"
+                        id="input-explanation"
+                        placeholder="সংক্ষিপ্ত ব্যাখ্যা (Optional)"
+                        class="w-full
+                               bg-slate-950
+                               border
+                               border-slate-700
+                               rounded-xl
+                               p-2
+                               text-xs
+                               text-white"
+                    >
+
                 </div>
-                <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" onclick="clickSound(); closeAddModal();" class="px-4 py-2 bg-slate-800 rounded-xl text-xs">বাতিল</button>
-                    <button type="submit" class="px-5 py-2 bg-red-600 hover:bg-red-500 rounded-xl text-xs font-bold">সেভ করুন</button>
+
+
+                <div
+                    class="flex
+                           justify-end
+                           gap-2
+                           pt-2"
+                >
+
+                    <button
+                        type="button"
+                        onclick="clickSound(); closeAddModal();"
+                        class="px-4
+                               py-2
+                               bg-slate-800
+                               rounded-xl
+                               text-xs"
+                    >
+                        বাতিল
+                    </button>
+
+
+                    <button
+                        type="submit"
+                        class="px-5
+                               py-2
+                               bg-red-600
+                               hover:bg-red-500
+                               rounded-xl
+                               text-xs
+                               font-bold"
+                    >
+                        সেভ করুন
+                    </button>
+
                 </div>
+
             </form>
+
         </div>
+
     </div>
 
-    <div id="battle-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-        <div class="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-md shadow-2xl">
-            <h3 class="text-lg font-bold text-slate-100 mb-2 text-center">⚔️ 1-vs-1 Battle Setup</h3>
-            <p class="text-xs text-slate-400 mb-4 text-center">বিষয় ও প্রশ্ন সংখ্যা সিলেক্ট করে চ্যালেঞ্জ লিংক বানান</p>
-            
+
+    <!-- =====================================================
+         BATTLE MODAL
+         ===================================================== -->
+
+    <div
+        id="battle-modal"
+        class="fixed
+               inset-0
+               bg-black/80
+               backdrop-blur-sm
+               hidden
+               items-center
+               justify-center
+               p-4
+               z-50"
+    >
+
+        <div
+            class="bg-slate-900
+                   border
+                   border-slate-700
+                   rounded-2xl
+                   p-6
+                   w-full
+                   max-w-md
+                   shadow-2xl"
+        >
+
+            <h3
+                class="text-lg
+                       font-bold
+                       text-slate-100
+                       mb-2
+                       text-center"
+            >
+                ⚔️ 1-vs-1 Battle Setup
+            </h3>
+
+
+            <p
+                class="text-xs
+                       text-slate-400
+                       mb-4
+                       text-center"
+            >
+                বিষয় ও প্রশ্ন সংখ্যা সিলেক্ট করে চ্যালেঞ্জ লিংক বানান
+            </p>
+
+
             <div class="space-y-4 mb-5">
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">বিষয় নির্বাচন করুন</label>
-                    <select id="battle-subject-select" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-2.5 text-xs text-white">
-                        <option value="Biology">জীববিজ্ঞান</option>
-                        <option value="Chemistry">রসায়ন</option>
-                        <option value="Physics">পদার্থবিজ্ঞান</option>
-                        <option value="English">ইংরেজি (BCS)</option>
-                        <option value="GK">সাধারণ জ্ঞান (BCS)</option>
-                    </select>
-                </div>
 
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">প্রশ্ন সংখ্যা নির্বাচন করুন</label>
+
+                    <label
+                        class="block
+                               text-xs
+                               text-slate-400
+                               mb-1"
+                    >
+                        বিষয় নির্বাচন করুন
+                    </label>
+
+
+                    <select
+                        id="battle-subject-select"
+                        class="w-full
+                               bg-slate-950
+                               border
+                               border-slate-700
+                               rounded-xl
+                               p-2.5
+                               text-xs
+                               text-white"
+                    >
+
+                        <option value="Biology">
+                            জীববিজ্ঞান
+                        </option>
+
+                        <option value="Chemistry">
+                            রসায়ন
+                        </option>
+
+                        <option value="Physics">
+                            পদার্থবিজ্ঞান
+                        </option>
+
+                        <option value="English">
+                            ইংরেজি (BCS)
+                        </option>
+
+                        <option value="GK">
+                            সাধারণ জ্ঞান (BCS)
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div>
+
+                    <label
+                        class="block
+                               text-xs
+                               text-slate-400
+                               mb-1"
+                    >
+                        প্রশ্ন সংখ্যা নির্বাচন করুন
+                    </label>
+
+
                     <div class="grid grid-cols-2 gap-3">
-                        <button type="button" onclick="clickSound(); setBattleQCount(10)" id="q-btn-10" class="battle-q-btn bg-red-600 border border-red-500 text-white font-bold py-2.5 rounded-xl text-xs">
+
+                        <button
+                            type="button"
+                            onclick="clickSound(); setBattleQCount(10)"
+                            id="q-btn-10"
+                            class="battle-q-btn
+                                   bg-red-600
+                                   border
+                                   border-red-500
+                                   text-white
+                                   font-bold
+                                   py-2.5
+                                   rounded-xl
+                                   text-xs"
+                        >
                             ১০ টি প্রশ্ন
                         </button>
-                        <button type="button" onclick="clickSound(); setBattleQCount(20)" id="q-btn-20" class="battle-q-btn bg-slate-800 border border-slate-700 text-slate-300 font-bold py-2.5 rounded-xl text-xs">
+
+
+                        <button
+                            type="button"
+                            onclick="clickSound(); setBattleQCount(20)"
+                            id="q-btn-20"
+                            class="battle-q-btn
+                                   bg-slate-800
+                                   border
+                                   border-slate-700
+                                   text-slate-300
+                                   font-bold
+                                   py-2.5
+                                   rounded-xl
+                                   text-xs"
+                        >
                             ২০ টি প্রশ্ন
                         </button>
+
                     </div>
+
                 </div>
+
             </div>
 
-            <button onclick="clickSound(); generateBattleLink()" class="w-full bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-bold py-2.5 rounded-xl text-xs mb-3 shadow-lg">
+
+            <button
+                onclick="clickSound(); generateBattleLink()"
+                class="w-full
+                       bg-gradient-to-r
+                       from-red-600
+                       to-amber-600
+                       hover:from-red-500
+                       hover:to-amber-500
+                       text-white
+                       font-bold
+                       py-2.5
+                       rounded-xl
+                       text-xs
+                       mb-3
+                       shadow-lg"
+            >
                 লিংক তৈরি করুন 🔗
             </button>
 
-            <div id="battle-link-box" class="hidden mb-4">
-                <input type="text" id="battle-url-input" readonly class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-center text-slate-300 mb-2">
-                <button onclick="clickSound(); copyBattleLink()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded-lg text-xs">
+
+            <div
+                id="battle-link-box"
+                class="hidden mb-4"
+            >
+
+                <input
+                    type="text"
+                    id="battle-url-input"
+                    readonly
+                    class="w-full
+                           bg-slate-950
+                           border
+                           border-slate-700
+                           rounded-lg
+                           p-2
+                           text-xs
+                           text-center
+                           text-slate-300
+                           mb-2"
+                >
+
+
+                <button
+                    onclick="clickSound(); copyBattleLink()"
+                    class="w-full
+                           bg-emerald-600
+                           hover:bg-emerald-500
+                           text-white
+                           font-bold
+                           py-2
+                           rounded-lg
+                           text-xs"
+                >
                     লিংক কপি করুন 📋
                 </button>
+
             </div>
+
 
             <div class="text-center">
-                <button onclick="clickSound(); closeBattleModal()" class="text-xs text-slate-500 hover:text-slate-300">বন্ধ করুন</button>
+
+                <button
+                    onclick="clickSound(); closeBattleModal()"
+                    class="text-xs
+                           text-slate-500
+                           hover:text-slate-300"
+                >
+                    বন্ধ করুন
+                </button>
+
             </div>
+
         </div>
+
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
+
+    <!-- =====================================================
+         JAVASCRIPT
+         ===================================================== -->
+
     <script>
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        /* ==================================================
+           AUDIO CONTEXT
+        ================================================== */
+
+        const audioCtx =
+            new (window.AudioContext || window.webkitAudioContext)();
+
+
+        /* ==================================================
+           🎵 BACKGROUND MUSIC SYSTEM
+        ================================================== */
+
+        const bgMusic =
+            document.getElementById('bg-music');
+
+        const musicButton =
+            document.getElementById('music-control');
+
+        const musicIcon =
+            document.getElementById('music-icon');
+
+
+        /*
+         * Background music volume
+         *
+         * 0.18 = 18%
+         * Ideal for studying / MCQ practice
+         */
+
+        bgMusic.volume = 0.18;
+
+        bgMusic.loop = true;
+
+
+        let musicStarted = false;
+
+        let musicMuted = false;
+
+
+        /* ==================================================
+           START MUSIC
+        ================================================== */
+
+        function startBackgroundMusic() {
+
+            if (musicStarted && !bgMusic.paused) {
+                return;
+            }
+
+            if (musicMuted) {
+                return;
+            }
+
+            bgMusic.volume = 0.18;
+
+            const playPromise = bgMusic.play();
+
+            if (playPromise !== undefined) {
+
+                playPromise
+                    .then(() => {
+
+                        musicStarted = true;
+
+                        musicMuted = false;
+
+                        updateMusicButton();
+
+                    })
+                    .catch(error => {
+
+                        console.log(
+                            "Browser blocked autoplay:",
+                            error
+                        );
+
+                    });
+
+            }
+
+        }
+
+
+        /* ==================================================
+           MUSIC ON / OFF
+        ================================================== */
+
+        function toggleMusic() {
+
+            if (bgMusic.paused) {
+
+                musicMuted = false;
+
+                bgMusic.volume = 0.18;
+
+                bgMusic.play()
+                    .then(() => {
+
+                        musicStarted = true;
+
+                        updateMusicButton();
+
+                    })
+                    .catch(error => {
+
+                        console.log(
+                            "Unable to play music:",
+                            error
+                        );
+
+                    });
+
+            } else {
+
+                bgMusic.pause();
+
+                musicMuted = true;
+
+                updateMusicButton();
+
+            }
+
+        }
+
+
+        /* ==================================================
+           UPDATE MUSIC BUTTON
+        ================================================== */
+
+        function updateMusicButton() {
+
+            if (!musicButton || !musicIcon) {
+                return;
+            }
+
+
+            if (bgMusic.paused) {
+
+                musicIcon.className =
+                    "fa-solid fa-volume-xmark";
+
+                musicButton.classList.remove(
+                    "music-playing"
+                );
+
+                musicButton.classList.add(
+                    "music-off"
+                );
+
+            } else {
+
+                musicIcon.className =
+                    "fa-solid fa-volume-high";
+
+                musicButton.classList.remove(
+                    "music-off"
+                );
+
+                musicButton.classList.add(
+                    "music-playing"
+                );
+
+            }
+
+        }
+
+
+        /* ==================================================
+           START MUSIC AFTER USER INTERACTION
+        ================================================== */
+
+        document.addEventListener(
+            "click",
+            function () {
+
+                if (!musicStarted && !musicMuted) {
+                    startBackgroundMusic();
+                }
+
+            },
+            {
+                passive: true
+            }
+        );
+
+
+        document.addEventListener(
+            "touchstart",
+            function () {
+
+                if (!musicStarted && !musicMuted) {
+                    startBackgroundMusic();
+                }
+
+            },
+            {
+                passive: true
+            }
+        );
+
+
+        /* ==================================================
+           PAGE VISIBILITY
+        ================================================== */
+
+        document.addEventListener(
+            "visibilitychange",
+            function () {
+
+                if (
+                    !document.hidden &&
+                    musicStarted &&
+                    !musicMuted
+                ) {
+
+                    bgMusic.play()
+                        .catch(() => {});
+
+                }
+
+            }
+        );
+
+
+        /* ==================================================
+           CLICK SOUND
+        ================================================== */
 
         function clickSound() {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
+
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+
+            const osc =
+                audioCtx.createOscillator();
+
+            const gain =
+                audioCtx.createGain();
+
+
             osc.connect(gain);
-            gain.connect(audioCtx.destination);
+
+            gain.connect(
+                audioCtx.destination
+            );
+
+
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+
+            osc.frequency.setValueAtTime(
+                600,
+                audioCtx.currentTime
+            );
+
+
+            gain.gain.setValueAtTime(
+                0.05,
+                audioCtx.currentTime
+            );
+
+
+            gain.gain.exponentialRampToValueAtTime(
+                0.001,
+                audioCtx.currentTime + 0.05
+            );
+
+
             osc.start();
-            osc.stop(audioCtx.currentTime + 0.05);
+
+            osc.stop(
+                audioCtx.currentTime + 0.05
+            );
+
         }
+
+
+        /* ==================================================
+           ANSWER SOUND
+        ================================================== */
 
         function playSound(type) {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
+
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+
+            const osc =
+                audioCtx.createOscillator();
+
+            const gain =
+                audioCtx.createGain();
+
+
             osc.connect(gain);
-            gain.connect(audioCtx.destination);
+
+            gain.connect(
+                audioCtx.destination
+            );
+
 
             if (type === 'correct') {
+
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
-                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.15); 
-                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+
+                osc.frequency.setValueAtTime(
+                    523.25,
+                    audioCtx.currentTime
+                );
+
+
+                osc.frequency.exponentialRampToValueAtTime(
+                    880,
+                    audioCtx.currentTime + 0.15
+                );
+
+
+                gain.gain.setValueAtTime(
+                    0.2,
+                    audioCtx.currentTime
+                );
+
+
+                gain.gain.exponentialRampToValueAtTime(
+                    0.01,
+                    audioCtx.currentTime + 0.3
+                );
+
+
                 osc.start();
-                osc.stop(audioCtx.currentTime + 0.3);
+
+                osc.stop(
+                    audioCtx.currentTime + 0.3
+                );
+
             } else {
+
                 osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(180, audioCtx.currentTime);
-                osc.frequency.setValueAtTime(110, audioCtx.currentTime + 0.1);
-                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+
+                osc.frequency.setValueAtTime(
+                    180,
+                    audioCtx.currentTime
+                );
+
+
+                osc.frequency.setValueAtTime(
+                    110,
+                    audioCtx.currentTime + 0.1
+                );
+
+
+                gain.gain.setValueAtTime(
+                    0.2,
+                    audioCtx.currentTime
+                );
+
+
+                gain.gain.exponentialRampToValueAtTime(
+                    0.01,
+                    audioCtx.currentTime + 0.3
+                );
+
+
                 osc.start();
-                osc.stop(audioCtx.currentTime + 0.3);
+
+                osc.stop(
+                    audioCtx.currentTime + 0.3
+                );
+
             }
+
         }
 
-        // STEP 1: GO TO PASSWORD SCREEN & START BELIEVER MP3 AUDIO
+
+        /* ==================================================
+           INTRO → PASSWORD
+        ================================================== */
+
         function goToPasswordScreen() {
-            clickSound();
-            const bgMusic = document.getElementById('bg-music');
-            bgMusic.volume = 0.3; 
-            bgMusic.play().catch(err => {
-                console.log("Autoplay issue prevented audio: ", err);
-            });
 
-            document.getElementById('intro-screen').classList.add('hidden');
-            document.getElementById('password-screen').classList.remove('hidden');
-            document.getElementById('password-screen').classList.add('flex');
+            clickSound();
+
+
+            /*
+             * PLAY button itself is a user interaction.
+             * Therefore browser allows the audio to start.
+             */
+
+            startBackgroundMusic();
+
+
+            document
+                .getElementById('intro-screen')
+                .classList
+                .add('hidden');
+
+
+            document
+                .getElementById('password-screen')
+                .classList
+                .remove('hidden');
+
+
+            document
+                .getElementById('password-screen')
+                .classList
+                .add('flex');
+
         }
 
-        // STEP 2: CHECK PASSWORD ('play dump')
-        function checkPassword() {
-            clickSound();
-            const input = document.getElementById('pass-input').value.trim().toLowerCase();
-            if (input === 'play dump') {
-                playSound('correct');
-                showFeedbackToast(true, "Welcome to DMC Master Plan!");
-                document.getElementById('password-screen').classList.add('hidden');
-                document.getElementById('password-screen').classList.remove('flex');
 
-                const mainApp = document.getElementById('main-app');
-                mainApp.classList.remove('hidden');
-                mainApp.classList.add('flex');
+        /* ==================================================
+           PASSWORD CHECK
+        ================================================== */
+
+        function checkPassword() {
+
+            clickSound();
+
+
+            /*
+             * Make sure music continues
+             */
+
+            startBackgroundMusic();
+
+
+            const input =
+                document
+                    .getElementById('pass-input')
+                    .value
+                    .trim()
+                    .toLowerCase();
+
+
+            if (input === 'play dump') {
+
+                playSound('correct');
+
+
+                showFeedbackToast(
+                    true,
+                    "Welcome to DMC Master Plan!"
+                );
+
+
+                document
+                    .getElementById('password-screen')
+                    .classList
+                    .add('hidden');
+
+
+                document
+                    .getElementById('password-screen')
+                    .classList
+                    .remove('flex');
+
+
+                const mainApp =
+                    document.getElementById(
+                        'main-app'
+                    );
+
+
+                mainApp.classList.remove(
+                    'hidden'
+                );
+
+
+                mainApp.classList.add(
+                    'flex'
+                );
+
 
                 startSlideshow();
+
                 startBackgroundSlideshow();
+
                 updateSubjectCounts();
+
+
+                /*
+                 * Ensure music remains alive
+                 */
+
+                startBackgroundMusic();
+
             } else {
+
                 playSound('wrong');
-                document.getElementById('pass-error').classList.remove('hidden');
-            }
-        }
 
-        // SLIDESHOW LOGIC FOR BANNER
-        const slideshowImages = ['29378_2.jpg', '24676.jpg', '9775.png', '2134.jpg'];
-        let currentSlide = 0;
-        function startSlideshow() {
-            setInterval(() => {
-                currentSlide = (currentSlide + 1) % slideshowImages.length;
-                const imgEl = document.getElementById('slideshow-img');
-                if (imgEl) imgEl.src = slideshowImages[currentSlide];
-            }, 3500);
-        }
 
-        // BACKGROUND FADED SLIDESHOW LOGIC FOR SCREEN 3
-        function startBackgroundSlideshow() {
-            const bgSlides = document.querySelectorAll('.bg-slide-item');
-            if (!bgSlides.length) return;
-            let currentBgIndex = 0;
+                document
+                    .getElementById('pass-error')
+                    .classList
+                    .remove('hidden');
 
-            setInterval(() => {
-                bgSlides[currentBgIndex].classList.remove('active');
-                currentBgIndex = (currentBgIndex + 1) % bgSlides.length;
-                bgSlides[currentBgIndex].classList.add('active');
-            }, 4000);
-        }
-
-        // DYNAMIC FEEDBACK TOAST
-        let toastTimeout;
-        function showFeedbackToast(isCorrect, customMsg = null) {
-            const toast = document.getElementById('feedback-toast');
-            const toastText = document.getElementById('toast-text');
-            clearTimeout(toastTimeout);
-
-            if (customMsg) {
-                toastText.innerText = customMsg;
-                toast.className = "fixed top-20 left-1/2 -translate-x-1/2 z-[120] block px-6 py-3 rounded-2xl text-center font-bold text-xs md:text-sm shadow-2xl backdrop-blur-md bg-slate-900 border-red-500 text-slate-100 toast-animate";
-            } else if (isCorrect) {
-                toastText.innerText = "তেরি প্রিপারেশন বহত আচ্ছা হ্যায় তেরি কাসাম 🔥";
-                toast.className = "fixed top-20 left-1/2 -translate-x-1/2 z-[120] block px-6 py-3 rounded-2xl text-center font-bold text-xs md:text-sm shadow-2xl backdrop-blur-md bg-emerald-950/90 border-emerald-500 text-emerald-300 toast-animate";
-            } else {
-                toastText.innerText = "তু তো গায়া বেটা কাম সে 💀";
-                toast.className = "fixed top-20 left-1/2 -translate-x-1/2 z-[120] block px-6 py-3 rounded-2xl text-center font-bold text-xs md:text-sm shadow-2xl backdrop-blur-md bg-red-950/90 border-red-500 text-red-300 toast-animate";
             }
 
-            toastTimeout = setTimeout(() => toast.classList.add('hidden'), 2500);
         }
 
-        // QUESTION DATABASE
-        const defaultQuestions = [
-            { id: 1, subject: 'Biology', question: 'হৃৎপিণ্ডের কোন কপাটিকা ৩ পাল্লা বিশিষ্ট (Tricuspid)?', options: ['বাইকাসপিড', 'ট্রাইকাসপিড', 'অ্যাওর্টিক', 'পালমোনারি'], correct: 1, explanation: 'ডান অলিন্দ ও ডান নিলয়ের সংযোগস্থলে এটি অবস্থিত।' },
-            { id: 2, subject: 'Chemistry', question: 'কোনটি প্রাইমারি স্ট্যান্ডার্ড পদার্থ?', options: ['NaOH', 'K2Cr2O7', 'KMnO4', 'HCl'], correct: 1, explanation: 'K2Cr2O7 বায়ুর উপাদানের সাথে সহজে বিক্রিয়া করে না।' },
-            { id: 3, subject: 'Physics', question: 'মহাকর্ষীয় ধ্রুবক (G) এর মাত্রা কোনটি?', options: ['[L3 M-1 T-2]', '[L2 M-1 T-2]', '[L3 M-2 T-2]', '[L1 M-1 T-2]'], correct: 0, explanation: 'G = Fr^2 / (m1*m2)' },
-            { id: 4, subject: 'English', question: 'Which one is the correct spelling? (38th BCS)', options: ['Heterogeneous', 'Heterogenous', 'Hetrogeneous', 'Heteroginous'], correct: 0, explanation: 'Correct spelling: Heterogeneous (অর্থ: বিভিন্ন উপাদানবিশিষ্ট)।' },
-            { id: 5, subject: 'English', question: 'Fill in the blank: "He has no control ___ himself." (43rd BCS)', options: ['on', 'over', 'with', 'after'], correct: 1, explanation: 'Control over someone/something ব্যবহৃত হয়।' },
-            { id: 6, subject: 'English', question: 'What is the noun form of "Brief"? (40th BCS)', options: ['Brevity', 'Briefness', 'Briefly', 'Shortness'], correct: 0, explanation: 'Brief-এর Noun form হলো Brevity (সংক্ষিপ্ততা)।' },
-            { id: 7, subject: 'GK', question: 'বাংলাদেশের একমাত্র প্রবাল দ্বীপ কোনটি? (41st BCS)', options: ['সেন্টমার্টিন', 'সন্দীপ', 'হাতিয়া', 'মহেশখালী'], correct: 0, explanation: 'সেন্টমার্টিন দ্বীপ কক্সবাজার জেলায় অবস্থিত একমাত্র প্রবাল দ্বীপ।' },
-            { id: 8, subject: 'GK', question: 'মুজিবনগর সরকার কত তারিখে শপথ গ্রহণ করে? (44th BCS)', options: ['১০ এপ্রিল ১৯৭১', '১৭ এপ্রিল ১৯৭১', '২৫ মার্চ ১৯৭১', '১৬ ডিসেম্বর ১৯৭১'], correct: 1, explanation: '১০ এপ্রিল গঠিত হয় এবং ১৭ এপ্রিল কুষ্টিয়ার মেহেরপুরের ভবেরপাড়ায় শপথ গ্রহণ করে।' },
-            { id: 9, subject: 'GK', question: 'ইউনেস্কো কত তারিখে ২১শে ফেব্রুয়ারিকে আন্তর্জাতিক মাতৃভাষা দিবস ঘোষণা করে? (35th BCS)', options: ['১৭ নভেম্বর ১৯৯৯', '২১ ফেব্রুয়ারি ২০০০', '১৬ ডিসেম্বর ১৯৯৯', '২৬ মার্চ ২০০১'], correct: 0, explanation: '১৭ নভেম্বর ১৯৯৯ সালে ইউনেস্কো স্বীকৃতি দেয়।' }
+
+        /* ==================================================
+           BANNER SLIDESHOW
+        ================================================== */
+
+        const slideshowImages = [
+            '29378_2.jpg',
+            '24676.jpg',
+            '9775.png',
+            '2134.jpg'
         ];
 
-        let questions = JSON.parse(localStorage.getItem('dmc_questions_v4')) || defaultQuestions;
-        let activeSubject = '';
-        let currentSubjectQuestions = [];
-        let questionIndex = 0;
-        let currentStreak = 0;
 
-        function updateSubjectCounts() {
-            ['Biology', 'Chemistry', 'Physics', 'English', 'GK'].forEach(sub => {
-                const count = questions.filter(q => q.subject === sub).length;
-                const badge = document.getElementById(`badge-${sub}`);
-                if (badge) badge.innerText = count;
-            });
-        }
+        let currentSlide = 0;
 
-        function showSubjects() {
-            document.getElementById('subject-view').classList.remove('hidden');
-            document.getElementById('quiz-view').classList.add('hidden');
-            updateSubjectCounts();
-        }
 
-        function selectSubject(sub) {
-            activeSubject = sub;
-            currentSubjectQuestions = questions.filter(q => q.subject === sub);
-            questionIndex = 0;
-            currentStreak = 0;
-            document.getElementById('streak-counter').innerText = `🔥 Streak: ${currentStreak}`;
-            document.getElementById('college-banner').classList.add('hidden');
+        function startSlideshow() {
 
-            document.getElementById('subject-view').classList.add('hidden');
-            document.getElementById('quiz-view').classList.remove('hidden');
-            document.getElementById('active-subject-badge').innerText = sub;
-            renderSingleQuestion();
-        }
+            setInterval(() => {
 
-        function renderSingleQuestion() {
-            const container = document.getElementById('single-question-card');
-            document.getElementById('next-btn-container').classList.add('hidden');
+                currentSlide =
+                    (currentSlide + 1) %
+                    slideshowImages.length;
 
-            if (currentSubjectQuestions.length === 0) {
-                container.innerHTML = `<p class="text-center text-xs text-slate-500 py-8">এই বিষয়ে কোনো প্রশ্ন নেই। ৩-ডট মেনু থেকে নতুন প্রশ্ন যোগ করুন!</p>`;
-                return;
-            }
 
-            if (questionIndex >= currentSubjectQuestions.length) {
-                container.innerHTML = `
-                    <div class="text-center py-8">
-                        <i class="fa-solid fa-trophy text-4xl text-amber-400 mb-2"></i>
-                        <h3 class="text-base font-bold text-slate-100">সবগুলো প্রশ্ন সম্পন্ন হয়েছে!</h3>
-                        <p class="text-xs text-slate-400 mt-1">আপনার মোট স্ট্রাইক স্কোর: ${currentStreak}</p>
-                    </div>`;
-                return;
-            }
+                const imgEl =
+                    document.getElementById(
+                        'slideshow-img'
+                    );
 
-            const q = currentSubjectQuestions[questionIndex];
-            container.innerHTML = `
-                <h4 class="text-base font-bold mb-4 text-slate-100">
-                    <span class="text-red-500 font-black">${questionIndex + 1}.</span> ${q.question}
-                </h4>
-                <div class="space-y-2.5">
-                    ${q.options.map((opt, idx) => `
-                        <button onclick="handleAnswer(${idx})" id="opt-btn-${idx}" class="w-full text-left p-3 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-600 text-xs text-slate-300 font-medium flex justify-between items-center transition">
-                            <span>${opt}</span>
-                            <span class="status-icon"></span>
-                        </button>
-                    `).join('')}
-                </div>
-                <div id="exp-box" class="hidden mt-4 p-3 bg-slate-950 rounded-xl border-l-4 border-emerald-500 text-xs text-slate-300">
-                    <span class="font-bold text-emerald-400">ব্যাখ্যা:</span> ${q.explanation || 'ব্যাখ্যা নেই।'}
-                </div>
-            `;
-        }
 
-        function handleAnswer(selectedIdx) {
-            const q = currentSubjectQuestions[questionIndex];
-            const isCorrect = selectedIdx === q.correct;
+                if (imgEl) {
 
-            if (isCorrect) {
-                playSound('correct');
-                showFeedbackToast(true);
-                currentStreak++;
-                confetti({ particleCount: 35, spread: 50, origin: { y: 0.8 } });
-            } else {
-                playSound('wrong');
-                showFeedbackToast(false);
-                currentStreak = 0;
-            }
+                    imgEl.src =
+                        slideshowImages[
+                            currentSlide
+                        ];
 
-            document.getElementById('streak-counter').innerText = `🔥 Streak: ${currentStreak}`;
-            const banner = document.getElementById('college-banner');
-            const collegeName = document.getElementById('college-name');
-
-            if (currentStreak >= 10) {
-                banner.classList.remove('hidden');
-                collegeName.innerText = "Allotted College: Dhaka Medical College (DMC) 🏛️";
-            } else if (currentStreak >= 5) {
-                banner.classList.remove('hidden');
-                collegeName.innerText = "Allotted College: Sir Salimullah Medical College 🏥";
-            } else {
-                banner.classList.add('hidden');
-            }
-
-            for (let i = 0; i < 4; i++) {
-                const btn = document.getElementById(`opt-btn-${i}`);
-                if (!btn) continue;
-                btn.disabled = true;
-
-                if (i === q.correct) {
-                    btn.className = "w-full text-left p-3 rounded-xl bg-emerald-950 border-2 border-emerald-500 text-emerald-200 text-xs font-semibold flex justify-between items-center";
-                    btn.querySelector('.status-icon').innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400"></i>';
-                } else if (i === selectedIdx && !isCorrect) {
-                    btn.className = "w-full text-left p-3 rounded-xl bg-red-950 border-2 border-red-500 text-red-200 text-xs font-semibold flex justify-between items-center";
-                    btn.querySelector('.status-icon').innerHTML = '<i class="fa-solid fa-circle-xmark text-red-400"></i>';
                 }
+
+            }, 3500);
+
+        }
+
+
+        /* ==================================================
+           BACKGROUND SLIDESHOW
+        ================================================== */
+
+        function startBackgroundSlideshow() {
+
+            const bgSlides =
+                document.querySelectorAll(
+                    '.bg-slide-item'
+                );
+
+
+            if (!bgSlides.length) {
+                return;
             }
 
-            document.getElementById('exp-box').classList.remove('hidden');
-            document.getElementById('next-btn-container').classList.remove('hidden');
+
+            let currentBgIndex = 0;
+
+
+            setInterval(() => {
+
+                bgSlides[
+                    currentBgIndex
+                ].classList.remove(
+                    'active'
+                );
+
+
+                currentBgIndex =
+                    (currentBgIndex + 1) %
+                    bgSlides.length;
+
+
+                bgSlides[
+                    currentBgIndex
+                ].classList.add(
+                    'active'
+                );
+
+
+            }, 4000);
+
         }
 
-        function loadNextQuestion() {
-            questionIndex++;
-            renderSingleQuestion();
-        }
 
-        function toggleMenu() {
-            document.getElementById('dropdown-menu').classList.toggle('hidden');
-        }
+        /* ==================================================
+           FEEDBACK TOAST
+        ================================================== */
 
-        function openAddModal() { document.getElementById('add-modal').classList.remove('hidden'); document.getElementById('add-modal').classList.add('flex'); }
-        function closeAddModal() { document.getElementById('add-modal').classList.add('hidden'); document.getElementById('add-modal').classList.remove('flex'); }
+        let toastTimeout;
 
-        function saveQuestion(e) {
-            e.preventDefault();
-            const newQ = {
-                id: Date.now(),
-                subject: document.getElementById('input-subject').value,
-                question: document.getElementById('input-question').value,
-                options: [document.getElementById('opt-0').value, document.getElementById('opt-1').value, document.getElementById('opt-2').value, document.getElementById('opt-3').value],
-                correct: parseInt(document.getElementById('input-correct').value),
-                explanation: document.getElementById('input-explanation').value
-            };
-            questions.push(newQ);
-            localStorage.setItem('dmc_questions_v4', JSON.stringify(questions));
-            document.getElementById('add-mcq-form').reset();
-            closeAddModal();
-            updateSubjectCounts();
-            showFeedbackToast(true, "নতুন প্রশ্ন যোগ হয়েছে!");
-        }
 
-        let selectedBattleCount = 10;
-        function openBattleModal() { document.getElementById('battle-modal').classList.remove('hidden'); document.getElementById('battle-modal').classList.add('flex'); }
-        function closeBattleModal() { document.getElementById('battle-modal').classList.add('hidden'); document.getElementById('battle-modal').classList.remove('flex'); }
-
-        function setBattleQCount(count) {
-            selectedBattleCount = count;
-            const btn10 = document.getElementById('q-btn-10');
-            const btn20 = document.getElementById('q-btn-20');
-
-            if (count === 10) {
-                btn10.className = "battle-q-btn bg-red-600 border border-red-500 text-white font-bold py-2.5 rounded-xl text-xs";
-                btn20.className = "battle-q-btn bg-slate-800 border border-slate-700 text-slate-300 font-bold py-2.5 rounded-xl text-xs";
-            } else {
-                btn20.className = "battle-q-btn bg-red-600 border border-red-500 text-white font-bold py-2.5 rounded-xl text-xs";
-                btn10.className = "battle-q-btn bg-slate-800 border border-slate-700 text-slate-300 font-bold py-2.5 rounded-xl text-xs";
-            }
-        }
-
-        function generateBattleLink() {
-            const subject = document.getElementById('battle-subject-select').value;
-            const battleId = Math.random().toString(36).substring(7);
-            const link = `${window.location.origin}${window.location.pathname}?battle=${battleId}&sub=${subject}&q=${selectedBattleCount}`;
-            document.getElementById('battle-url-input').value = link;
-            document.getElementById('battle-link-box').classList.remove('hidden');
-        }
-
-        function copyBattleLink() {
-            const input = document.getElementById('battle-url-input');
-            input.select();
-            navigator.clipboard.writeText(input.value);
-            showFeedbackToast(true, "ব্যাটল লিংক কপি হয়েছে!");
-        }
-    </script>
-</body>
-</html>
+        function
